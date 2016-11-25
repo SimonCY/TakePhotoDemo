@@ -2,111 +2,17 @@
 //  UIImage+Resize.m
 //  SCCaptureCameraDemo
 //
-//  Created by Aevitx on 14-1-17.
-//  Copyright (c) 2014年 Aevitx. All rights reserved.
+//  Created by chenyan on 14-1-17.
+//  Copyright (c) 2014年 chenyan. All rights reserved.
 //
 
-#import "UIImage+Resize.h"
+#import "UIImage+CYExtension.h"
+#import "iPhoneMacro.h"
 
 @implementation UIImage (Resize)
-// Returns a copy of this image that is cropped to the given bounds.
-// The bounds will be adjusted using CGRectIntegral.
-// This method ignores the image's imageOrientation setting.
-- (UIImage *)croppedImage:(CGRect)bounds {
-    CGImageRef imageRef = CGImageCreateWithImageInRect([self CGImage], bounds);
-    UIImage *croppedImage = [UIImage imageWithCGImage:imageRef];
-    CGImageRelease(imageRef);
-    return croppedImage;
-}
-
-// Returns a rescaled copy of the image, taking into account its orientation
-// The image will be scaled disproportionately if necessary to fit the bounds specified by the parameter
-- (UIImage *)resizedImage:(CGSize)newSize interpolationQuality:(CGInterpolationQuality)quality {
-    BOOL drawTransposed;
-    CGAffineTransform transform = CGAffineTransformIdentity;
-    
-    // In iOS 5 the image is already correctly rotated. See Eran Sandler's
-    // addition here: http://eran.sandler.co.il/2011/11/07/uiimage-in-ios-5-orientation-and-resize/
-    
-    if([[[UIDevice currentDevice]systemVersion]floatValue] >= 5.0) {
-        drawTransposed = YES;
-    }
-    else {
-        switch(self.imageOrientation) {
-            case UIImageOrientationLeft:
-            case UIImageOrientationLeftMirrored:
-            case UIImageOrientationRight:
-            case UIImageOrientationRightMirrored:
-                drawTransposed = YES;
-                break;
-            default:
-                drawTransposed = NO;
-        }
-        
-        transform = [self transformForOrientation:newSize];
-    }
-    transform = [self transformForOrientation:newSize];
-    return [self resizedImage:newSize transform:transform drawTransposed:drawTransposed interpolationQuality:quality];
-}
-
-// Resizes the image according to the given content mode, taking into account the image's orientation
-- (UIImage *)resizedImageWithContentMode:(UIViewContentMode)contentMode
-                                  bounds:(CGSize)bounds
-                    interpolationQuality:(CGInterpolationQuality)quality {
-    CGFloat horizontalRatio = bounds.width / self.size.width;
-    CGFloat verticalRatio = bounds.height / self.size.height;
-    CGFloat ratio;
-    
-    switch(contentMode) {
-        case UIViewContentModeScaleAspectFill:
-            ratio = MAX(horizontalRatio, verticalRatio);
-            break;
-            
-        case UIViewContentModeScaleAspectFit:
-            ratio = MIN(horizontalRatio, verticalRatio);
-            break;
-            
-        default:
-            [NSException raise:NSInvalidArgumentException format:@"Unsupported content mode: %ld", (long)contentMode];
-    }
-    
-    CGSize newSize = CGSizeMake(self.size.width * ratio, self.size.height * ratio);
-    
-    return [self resizedImage:newSize interpolationQuality:quality];
-}
 
 
-/**
- *  按比例 缩放到指定的宽 或 指定的高。  isScaleHeight:是否缩放到指定的高。 yes，是。NO，否。
- *
- *  @param img           要缩放的图片
- *  @param h             缩放到指定的高的值
- *  @param w             缩放到指定的宽的值
- *  @param isScaleHeight 是否缩放到指定的高
- *
- *  @return 缩放后的尺寸
- */
--(CGSize)scaleImg:(UIImage*)img scaleToHeight:(CGFloat)h scaleToWidth:(CGFloat)w isScaleHeight:(BOOL)isScaleHeight{
-    if( img == nil ) return CGSizeZero;
-    
-    CGSize imgSize = img.size;
-    
-    CGSize retSize = CGSizeZero;
-    if( isScaleHeight ){
-        retSize.height = h;
-        
-        CGFloat retW = imgSize.width*h/imgSize.height;
-        retSize.width = retW;
-    }else{
-        retSize.width = w;
-        CGFloat retH = imgSize.height*w/imgSize.width;
-        retSize.height = retH;
-    }
-    
-    return retSize;
-}
 
-#pragma mark - fix orientation
 - (UIImage *)fixOrientation {
     
     // No-op if the orientation is already correct
@@ -187,8 +93,127 @@
     return img;
 }
 
-static inline CGFloat DegreesToRadians(CGFloat degrees)
-{
+#pragma mark - cut image
+/**
+ *  切成正方形   只适合处理屏幕大小的图片（未缩放）
+ */
+- (UIImage *)cutImageForRect:(CGRect)usebleRect {
+    // CGImageCreateWithImageInRect只认像素
+    
+    CGFloat newX = 0;
+    CGFloat newY = (self.size.height - self.size.width) / 2;
+    CGFloat newW = self.size.width;
+    CGFloat newH = newW;
+    CGImageRef newImageRef = CGImageCreateWithImageInRect(self.CGImage, CGRectMake(newX,newY, newW , newH));
+    UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
+    CGImageRelease(newImageRef);
+    CYLog(@"newImage size is %@ ,scale is %f",[NSValue valueWithCGSize:newImage.size],[UIScreen mainScreen].scale);
+    
+    if (newImage == nil) {
+        CYLog(@"裁图失败");
+    }
+    return newImage;
+}
+
+
+#pragma mark - copy or scale image'
+- (UIImage *)copyImage{
+    
+    CGImageRef imageRef = CGImageCreateWithImageInRect([self CGImage], CGRectMake(0, 0, self.size.width,self.size.height));
+    UIImage *newImage = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    return newImage;
+}
+
+- (UIImage *)copyImageToNewSize:(CGSize)newSize {
+    
+    CGImageRef imageRef = CGImageCreateWithImageInRect([self CGImage], CGRectMake(0, 0, newSize.width, newSize.height));
+    UIImage *newImage = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    return newImage;
+}
+
+- (UIImage *)copyImageToNewWidth:(CGFloat)newWidth {
+    
+    CGFloat newHeight = self.size.height / self.size.width * newWidth;
+    
+    CGImageRef imageRef = CGImageCreateWithImageInRect([self CGImage], CGRectMake(0, 0, newWidth, newHeight));
+    UIImage *newImage = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    return newImage;
+}
+
+- (UIImage *)copyImageToNewHeight:(CGFloat)newHeight{
+    
+    CGFloat newWidth = self.size.width / self.size.height * newHeight;
+    
+    CGImageRef imageRef = CGImageCreateWithImageInRect([self CGImage], CGRectMake(0, 0, newWidth, newHeight));
+    UIImage *newImage = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    return newImage;
+}
+
+#pragma mark - scale image
+// Returns a rescaled copy of the image, taking into account its orientation
+// The image will be scaled disproportionately if necessary to fit the bounds specified by the parameter
+- (UIImage *)resizedImage:(CGSize)newSize interpolationQuality:(CGInterpolationQuality)quality {
+    BOOL drawTransposed;
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    
+
+    
+    if([[[UIDevice currentDevice]systemVersion]floatValue] >= 5.0) {
+        drawTransposed = YES;
+    }
+    else {
+        switch(self.imageOrientation) {
+            case UIImageOrientationLeft:
+            case UIImageOrientationLeftMirrored:
+            case UIImageOrientationRight:
+            case UIImageOrientationRightMirrored:
+                drawTransposed = YES;
+                break;
+            default:
+                drawTransposed = NO;
+        }
+        
+        transform = [self transformForOrientation:newSize];
+    }
+    transform = [self transformForOrientation:newSize];
+    return [self resizedImage:newSize transform:transform drawTransposed:drawTransposed interpolationQuality:quality];
+}
+
+// Resizes the image according to the given content mode, taking into account the image's orientation
+- (UIImage *)resizedImageWithContentMode:(UIViewContentMode)contentMode
+                                  size:(CGSize)newSize
+                    interpolationQuality:(CGInterpolationQuality)quality {
+    CGFloat horizontalRatio = newSize.width / self.size.width;
+    CGFloat verticalRatio = newSize.height / self.size.height;
+    CGFloat ratio;
+    
+    switch(contentMode) {
+        case UIViewContentModeScaleAspectFill:
+            ratio = MAX(horizontalRatio, verticalRatio);
+            break;
+            
+        case UIViewContentModeScaleAspectFit:
+            ratio = MIN(horizontalRatio, verticalRatio);
+            break;
+            
+        default:
+            [NSException raise:NSInvalidArgumentException format:@"Unsupported content mode: %ld", (long)contentMode];
+    }
+    
+    return [self resizedImage:newSize interpolationQuality:quality];
+}
+
+
+
+
+
+#pragma mark - rotate image
+
+static inline CGFloat DegreesToRadians(CGFloat degrees) {
     return M_PI * (degrees / 180.0);
 }
 
@@ -218,10 +243,8 @@ static inline CGFloat DegreesToRadians(CGFloat degrees)
     UIGraphicsEndImageContext();
     return newImage;
     
-    
 }
 
-#pragma mark -
 #pragma mark Private helper methods
 
 // Returns a copy of the image that has been transformed using the given affine transform and scaled to the new size
@@ -265,6 +288,7 @@ static inline CGFloat DegreesToRadians(CGFloat degrees)
     
     return newImage;
 }
+
 
 // Returns an affine transform that takes into account the image orientation when drawing a scaled image
 - (CGAffineTransform)transformForOrientation:(CGSize)newSize {

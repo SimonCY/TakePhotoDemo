@@ -9,13 +9,22 @@
 #import "SCCaptureSessionManager.h"
 #import <ImageIO/ImageIO.h>
 #import "SCCommon.h"
-#import "UIImage+Resize.h"
+#import "UIImage+CYExtension.h"
 
 @interface SCCaptureSessionManager ()<AVCaptureVideoDataOutputSampleBufferDelegate>
 
-@property (nonatomic, strong) UIView *preview;
+//预览图层将要添加到的View
+@property (nonatomic, strong) UIView *parentView;
+
+//前摄像头
+@property (nonatomic,strong) AVCaptureDevice* frontCamera;
+//后摄像头
+@property (nonatomic,strong) AVCaptureDevice* backCamera;
+//麦克风
+@property (nonatomic,strong) AVCaptureDevice* audioDevice;
  
 @end
+
 
 @implementation SCCaptureSessionManager
 
@@ -43,7 +52,7 @@
 
 - (void)configureWithParentView:(UIView*)parentView previewRect:(CGRect)preivewRect thumbPreviewRect:(CGRect)thumbPreviewRect {
     
-    self.preview = parentView;
+    self.parentView = parentView;
     
     //1、队列
     [self createQueue];
@@ -102,57 +111,32 @@
  */
 - (void)addVideoInputLens:(SCCaptureInputDeviceType)lensType {
     
-    NSArray *devices = [AVCaptureDevice devices];
-    //前摄像头
-    AVCaptureDevice *frontCamera;
-    //后摄像头
-    AVCaptureDevice *backCamera;
-    
-    for (AVCaptureDevice *device in devices) {
-        
-        SCDLog(@"InputDevice: %@", [device localizedName]);
-        
-        if ([device hasMediaType:AVMediaTypeVideo]) {
-
-            if ([device position] == AVCaptureDevicePositionBack) {
-                
-                SCDLog(@"后摄像头");
-                backCamera = device;
-                
-            }  else {
-                
-                SCDLog(@"前摄像头");
-                frontCamera = device;
-            }
-        }
-    }
-    
     NSError *error = nil;
     switch (lensType) {
         case SCCaptureInputDeviceTypeBackLens: {
             
-            AVCaptureDeviceInput *backFacingCameraDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:backCamera error:&error];
+            AVCaptureDeviceInput *backFacingCameraDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:self.backCamera error:&error];
             if (!error) {
                 if ([_session canAddInput:backFacingCameraDeviceInput]) {
                     [_session addInput:backFacingCameraDeviceInput];
                     self.inputDevice = backFacingCameraDeviceInput;
                     
                 } else {
-                    SCDLog(@"无法切换到后摄像头");
+                    CYLog(@"无法切换到后摄像头");
                 }
             }
             break;
         }
         case SCCaptureInputDeviceTypeFrontLens: {
             
-            AVCaptureDeviceInput *frontFacingCameraDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:frontCamera error:&error];
+            AVCaptureDeviceInput *frontFacingCameraDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:self.frontCamera error:&error];
             if (!error) {
                 if ([_session canAddInput:frontFacingCameraDeviceInput]) {
                     [_session addInput:frontFacingCameraDeviceInput];
                     self.inputDevice = frontFacingCameraDeviceInput;
                     
                 } else {
-                    SCDLog(@"无法切换到前摄像头");
+                    CYLog(@"无法切换到前摄像头");
                 }
             }
             break;
@@ -202,9 +186,17 @@
     
 }
 
-// 在视频输出函数中绘制出来
+#pragma mark - videoOutputDelegate
+
+/** 取得视频每帧静态图 */
 -(void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *)connection {
 
+    if ([UIDevice currentDevice].systemVersion.floatValue < 9) {
+        [_thumbPreView removeFromSuperview];
+        _thumbPreView = nil;
+        return;
+    }
+    
      if (_thumbPreView.context != [EAGLContext currentContext]) {
         [EAGLContext setCurrentContext:_thumbPreView.context];
     }
@@ -217,16 +209,8 @@
 }
 
 
-#pragma mark - set and get
-- (AVCaptureFlashMode)flashMode {
-    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    
-    if (device.flashAvailable) {
-        
-        return device.flashMode;
-    }
-    return AVCaptureFlashModeOff;
-}
+#pragma mark - setter
+
 - (void)setVideoOrientation:(AVCaptureVideoOrientation)videoOrientation {
     _videoOrientation = videoOrientation;
     
@@ -239,6 +223,7 @@
     AVCaptureConnection *previewConnection = [self.previewLayer connection];
     previewConnection.videoOrientation = videoOrientation;
 }
+
 
 #pragma mark - camera actions
 
@@ -254,18 +239,20 @@
         videoConnection.videoOrientation = [self videoOrientation];
     }
     
+   WEAKSELF_CY
+    
     [_stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         
         if (imageDataSampleBuffer == NULL || error) {
-            SCDLog(@"取图片时发生错误");
+            CYLog(@"取图片时发生错误");
         }
         
         //将imageDataSampleBuffer处理成image
         CFDictionaryRef exifAttachments = CMGetAttachment(imageDataSampleBuffer, kCGImagePropertyExifDictionary, NULL);
         if (exifAttachments) {
-            SCDLog(@"attachements: %@", exifAttachments);
+            CYLog(@"attachements: %@", exifAttachments);
         } else {
-            SCDLog(@"no attachments");
+            CYLog(@"no attachments");
         }
     
         NSData *imageData = nil;
@@ -273,18 +260,17 @@
             imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
         }
         
-        SCDLog(@"image Size: %ld",imageData.length);
+        CYLog(@"image Size: %ld",imageData.length);
         UIImage *croppedImage = [[UIImage alloc] initWithData:imageData];
         
-        SCDLog(@"原图:%@", [NSValue valueWithCGSize:croppedImage.size]);
+        CYLog(@"原图:%@", [NSValue valueWithCGSize:croppedImage.size]);
 
         //block、delegate、notification 3选1，传值
         if (block) {
             
             block(croppedImage);
-        } else if (self.delegate && [self.delegate respondsToSelector:@selector(didCapturePhoto:)]) {
-            
-            [self.delegate didCapturePhoto:croppedImage];
+        } else if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(didCapturePhoto:)]) {
+            [weakSelf.delegate didCapturePhoto:croppedImage];
         } else {
             
             [[NSNotificationCenter defaultCenter] postNotificationName:kCapturedPhotoSuccessfully object:croppedImage];
@@ -300,7 +286,7 @@
  */
 - (void)switchCamera:(SCCaptureInputDeviceType)lensType {
     if (!_inputDevice) {
-        SCDLog(@"当前没有输入设备");
+        CYLog(@"当前没有输入设备");
         return;
     }
     [_session beginConfiguration];
@@ -336,7 +322,7 @@
     
 	NSUInteger numTouches = [gesture numberOfTouches], i;
 	for ( i = 0; i < numTouches; ++i ) {
-		CGPoint location = [gesture locationOfTouch:i inView:_preview];
+		CGPoint location = [gesture locationOfTouch:i inView:self.parentView];
 		CGPoint convertedLocation = [_previewLayer convertPoint:location fromLayer:_previewLayer.superlayer];
 		if ( ! [_previewLayer containsPoint:convertedLocation] ) {
 			allTouchesAreOnThePreviewLayer = NO;
@@ -360,7 +346,7 @@
         [gesture state] == UIGestureRecognizerStateCancelled ||
         [gesture state] == UIGestureRecognizerStateFailed) {
         _preScaleNum = _scaleNum;
-        SCDLog(@"final scale: %f", _scaleNum);
+        CYLog(@"final scale: %f", _scaleNum);
     }
 }
 
@@ -457,7 +443,7 @@
 		}
 		else
 		{
-			SCDLog(@"对焦和曝光补偿设置错误%@", error);
+			CYLog(@"对焦和曝光补偿设置错误%@", error);
 		}
 	});
 }
@@ -537,19 +523,17 @@
     return pointOfInterest;
 }
 
-//- (void)saveImageToPhotoAlbum:(UIImage*)image {
-//    UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
-//}
-//
-//- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-//    if (error != NULL) {
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"出错了!" message:@"存不了T_T" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
-//        [alert show];
-//    } else {
-//        SCDLog(@"保存成功111");
-//    }
-//}
+#pragma mark - rotate about
 
+//屏幕旋转时调整视频预览图层的方向
+-(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    self.videoOrientation = [self videoOrientationForDeviceOrientation:(UIDeviceOrientation)toInterfaceOrientation];
+}
+
+//旋转后重新设置大小
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    self.previewLayer.frame= self.parentView.bounds;
+}
 
 #pragma mark ---------------private--------------
 
@@ -563,16 +547,71 @@
     return result;
 }
 
-//屏幕旋转时调整视频预览图层的方向
--(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    self.videoOrientation = [self videoOrientationForDeviceOrientation:(UIDeviceOrientation)toInterfaceOrientation];
+/** 取得当前闪光模式 */
+- (AVCaptureFlashMode)flashMode {
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    
+    if (device.flashAvailable) {
+        
+        return device.flashMode;
+    }
+    return AVCaptureFlashModeOff;
 }
 
-//旋转后重新设置大小
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    self.previewLayer.frame= self.preview.bounds;
+/** 取得当前活跃的摄像头 */
+- (AVCaptureDevice *)activeCamera {
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    if (device) {
+        CYLog(@"active camera : %@",device.localizedName);
+        return device;
+    }
+    CYLog(@"there is no active camera");
+    return nil;
 }
 
+/** 取得前摄像头 */
+- (AVCaptureDevice *)frontCamera {
+    
+    NSArray *devices = [AVCaptureDevice devices];
+    for (AVCaptureDevice *device in devices) {
+        
+        if ([device hasMediaType:AVMediaTypeVideo] && [device position] == AVCaptureDevicePositionFront) {
+            CYLog(@"inputDevice:%@",device.localizedName);
+            return device;
+        }
+    }
+    CYLog(@"inputDevice: there is no front camera!");
+    return nil;
+}
+
+/** 取得后摄像头 */
+- (AVCaptureDevice *)backCamera {
+    
+    NSArray *devices = [AVCaptureDevice devices];
+    for (AVCaptureDevice *device in devices) {
+        
+        if ([device hasMediaType:AVMediaTypeVideo] && [device position] == AVCaptureDevicePositionBack) {
+            CYLog(@"inputDevice:%@",device.localizedName);
+            return device;
+        }
+    }
+    CYLog(@"inputDevice: there is no back camera!");
+    return nil;
+}
+/** 取得当前声音输入设备 */
+- (AVCaptureDevice *)audioDevice {
+    
+    NSArray *devices = [AVCaptureDevice devices];
+    for (AVCaptureDevice *device in devices) {
+        
+        if ([device hasMediaType:AVMediaTypeAudio]) {
+            CYLog(@"inputDevice:%@",device.localizedName);
+            return device;
+        }
+    }
+    CYLog(@"inputDevice: there is no audio inputDevice!");
+    return nil;
+}
 
 /** 得到相机输出的设备连接 （相机专用） */
 - (AVCaptureConnection*)findCaptureConnectionFromStillImageOutput {

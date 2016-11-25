@@ -6,13 +6,22 @@
 //  Copyright (c) 2014年 chenyan. All rights reserved.
 //
 
+/**
+ *  vender four frameworks:
+ 
+ *  1、CoreMedia.framework
+ *  2、QuartzCore.framework
+ *  3、AVFoundation.framework
+ *  4、ImmageIO.framework
+ */
 
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
-#import "SCDefines.h"
+#import "iPhoneMacro.h"
+
 
 
 @protocol SCCaptureSessionManager;
@@ -35,6 +44,8 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
     SCCaptureOutputDeviceTypeVideoFile,
 };
 */
+
+#define kCapturedPhotoSuccessfully              @"caputuredPhotoSuccessfully"
 
 @protocol SCCaptureSessionManager <NSObject>
 @optional

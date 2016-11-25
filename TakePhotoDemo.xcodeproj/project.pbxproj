@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		732104F21DE841BA00FA2E8A /* SCCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 732104F11DE841BA00FA2E8A /* SCCommon.m */; };
+		732104F51DE841D900FA2E8A /* UIImage+CYExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 732104F41DE841D900FA2E8A /* UIImage+CYExtension.m */; };
+		732104F81DE842D100FA2E8A /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 732104F71DE842D100FA2E8A /* CoreImage.framework */; };
 		732F9F351DD02C0A00D96865 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 732F9F341DD02C0A00D96865 /* main.m */; };
 		732F9F381DD02C0A00D96865 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 732F9F371DD02C0A00D96865 /* AppDelegate.m */; };
 		732F9F3B1DD02C0A00D96865 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 732F9F3A1DD02C0A00D96865 /* ViewController.m */; };
@@ -22,8 +25,6 @@
 		73EEBF911DD2F1AD00656464 /* SCCaptureCameraController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF841DD2F1AD00656464 /* SCCaptureCameraController.m */; };
 		73EEBF921DD2F1AD00656464 /* SCCaptureSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF861DD2F1AD00656464 /* SCCaptureSessionManager.m */; };
 		73EEBF941DD2F1AD00656464 /* SCSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF8A1DD2F1AD00656464 /* SCSlider.m */; };
-		73EEBF951DD2F1AD00656464 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF8C1DD2F1AD00656464 /* UIImage+Resize.m */; };
-		73EEBF961DD2F1AD00656464 /* SCCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF8F1DD2F1AD00656464 /* SCCommon.m */; };
 		73EEBFA11DD2F2E000656464 /* SVIndefiniteAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF9D1DD2F2E000656464 /* SVIndefiniteAnimatedView.m */; };
 		73EEBFA21DD2F2E000656464 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 73EEBF9E1DD2F2E000656464 /* SVProgressHUD.bundle */; };
 		73EEBFA31DD2F2E000656464 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBFA01DD2F2E000656464 /* SVProgressHUD.m */; };
@@ -48,6 +49,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		732104EF1DE841BA00FA2E8A /* iPhoneMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iPhoneMacro.h; sourceTree = "<group>"; };
+		732104F01DE841BA00FA2E8A /* SCCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCCommon.h; sourceTree = "<group>"; };
+		732104F11DE841BA00FA2E8A /* SCCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCCommon.m; sourceTree = "<group>"; };
+		732104F31DE841D900FA2E8A /* UIImage+CYExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+CYExtension.h"; sourceTree = "<group>"; };
+		732104F41DE841D900FA2E8A /* UIImage+CYExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CYExtension.m"; sourceTree = "<group>"; };
+		732104F71DE842D100FA2E8A /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		732F9F301DD02C0A00D96865 /* TakePhotoDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TakePhotoDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		732F9F341DD02C0A00D96865 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		732F9F361DD02C0A00D96865 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -77,11 +84,6 @@
 		73EEBF861DD2F1AD00656464 /* SCCaptureSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCCaptureSessionManager.m; sourceTree = "<group>"; };
 		73EEBF891DD2F1AD00656464 /* SCSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCSlider.h; sourceTree = "<group>"; };
 		73EEBF8A1DD2F1AD00656464 /* SCSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCSlider.m; sourceTree = "<group>"; };
-		73EEBF8B1DD2F1AD00656464 /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Resize.h"; sourceTree = "<group>"; };
-		73EEBF8C1DD2F1AD00656464 /* UIImage+Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Resize.m"; sourceTree = "<group>"; };
-		73EEBF8E1DD2F1AD00656464 /* SCCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCCommon.h; sourceTree = "<group>"; };
-		73EEBF8F1DD2F1AD00656464 /* SCCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCCommon.m; sourceTree = "<group>"; };
-		73EEBF901DD2F1AD00656464 /* SCDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCDefines.h; sourceTree = "<group>"; };
 		73EEBF9C1DD2F2E000656464 /* SVIndefiniteAnimatedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVIndefiniteAnimatedView.h; sourceTree = "<group>"; };
 		73EEBF9D1DD2F2E000656464 /* SVIndefiniteAnimatedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVIndefiniteAnimatedView.m; sourceTree = "<group>"; };
 		73EEBF9E1DD2F2E000656464 /* SVProgressHUD.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SVProgressHUD.bundle; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				732104F81DE842D100FA2E8A /* CoreImage.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +119,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		732104EE1DE841BA00FA2E8A /* CYCommon */ = {
+			isa = PBXGroup;
+			children = (
+				732104F31DE841D900FA2E8A /* UIImage+CYExtension.h */,
+				732104F41DE841D900FA2E8A /* UIImage+CYExtension.m */,
+				732104EF1DE841BA00FA2E8A /* iPhoneMacro.h */,
+				732104F01DE841BA00FA2E8A /* SCCommon.h */,
+				732104F11DE841BA00FA2E8A /* SCCommon.m */,
+			);
+			path = CYCommon;
+			sourceTree = "<group>";
+		};
+		732104F61DE842D100FA2E8A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				732104F71DE842D100FA2E8A /* CoreImage.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		732F9F271DD02C0A00D96865 = {
 			isa = PBXGroup;
 			children = (
@@ -124,6 +147,7 @@
 				732F9F4C1DD02C0A00D96865 /* TakePhotoDemoTests */,
 				732F9F571DD02C0A00D96865 /* TakePhotoDemoUITests */,
 				732F9F311DD02C0A00D96865 /* Products */,
+				732104F61DE842D100FA2E8A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -190,9 +214,9 @@
 		73EEBF811DD2F1A000656464 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				732104EE1DE841BA00FA2E8A /* CYCommon */,
 				73EEBF9B1DD2F2E000656464 /* SVProgressHUD */,
 				73EEBF821DD2F1AD00656464 /* SCCamera */,
-				73EEBF8D1DD2F1AD00656464 /* SCCommon */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
@@ -206,20 +230,8 @@
 				73EEBF861DD2F1AD00656464 /* SCCaptureSessionManager.m */,
 				73EEBF891DD2F1AD00656464 /* SCSlider.h */,
 				73EEBF8A1DD2F1AD00656464 /* SCSlider.m */,
-				73EEBF8B1DD2F1AD00656464 /* UIImage+Resize.h */,
-				73EEBF8C1DD2F1AD00656464 /* UIImage+Resize.m */,
 			);
 			path = SCCamera;
-			sourceTree = "<group>";
-		};
-		73EEBF8D1DD2F1AD00656464 /* SCCommon */ = {
-			isa = PBXGroup;
-			children = (
-				73EEBF8E1DD2F1AD00656464 /* SCCommon.h */,
-				73EEBF8F1DD2F1AD00656464 /* SCCommon.m */,
-				73EEBF901DD2F1AD00656464 /* SCDefines.h */,
-			);
-			path = SCCommon;
 			sourceTree = "<group>";
 		};
 		73EEBF9B1DD2F2E000656464 /* SVProgressHUD */ = {
@@ -383,10 +395,10 @@
 			files = (
 				732F9F3B1DD02C0A00D96865 /* ViewController.m in Sources */,
 				73EEBF911DD2F1AD00656464 /* SCCaptureCameraController.m in Sources */,
+				732104F21DE841BA00FA2E8A /* SCCommon.m in Sources */,
 				73EEBF921DD2F1AD00656464 /* SCCaptureSessionManager.m in Sources */,
-				73EEBF951DD2F1AD00656464 /* UIImage+Resize.m in Sources */,
-				73EEBF961DD2F1AD00656464 /* SCCommon.m in Sources */,
 				732F9F381DD02C0A00D96865 /* AppDelegate.m in Sources */,
+				732104F51DE841D900FA2E8A /* UIImage+CYExtension.m in Sources */,
 				73EEBFA71DD2F52400656464 /* CYDeviceManager.m in Sources */,
 				73E81E361DD956BE00DD1F7B /* rotaPreView.m in Sources */,
 				73EEBFA31DD2F2E000656464 /* SVProgressHUD.m in Sources */,

@@ -7,7 +7,7 @@
 //
 
 #import "SCCommon.h"
-#import "SCDefines.h"
+#import "iPhoneMacro.h"
 #import <QuartzCore/QuartzCore.h>
 
 @implementation SCCommon
@@ -52,7 +52,7 @@
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"出错了!" message:@"存不了T_T" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
     } else {
-        SCDLog(@"保存成功");
+        CYLog(@"保存成功");
     }
 }
 
