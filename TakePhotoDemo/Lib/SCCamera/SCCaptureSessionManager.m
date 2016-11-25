@@ -8,7 +8,7 @@
 
 #import "SCCaptureSessionManager.h"
 #import <ImageIO/ImageIO.h>
-#import "SCCommon.h"
+#import "CYCommon.h"
 #import "UIImage+CYExtension.h"
 
 @interface SCCaptureSessionManager ()<AVCaptureVideoDataOutputSampleBufferDelegate>

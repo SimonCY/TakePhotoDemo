@@ -1,16 +1,12 @@
-//
-//  SCCommon.m
-//  SCCaptureCameraDemo
-//
-//  Created by Aevitx on 14-1-19.
-//  Copyright (c) 2014年 Aevitx. All rights reserved.
-//
 
-#import "SCCommon.h"
+
+
+
+#import "CYCommon.h"
 #import "iPhoneMacro.h"
 #import <QuartzCore/QuartzCore.h>
 
-@implementation SCCommon
+@implementation CYCommon
 
 
 /**

@@ -1,16 +1,8 @@
-//
-//  SCCommon.h
-//  SCCaptureCameraDemo
-//
-//  Created by Aevitx on 14-1-19.
-//  Copyright (c) 2014年 Aevitx. All rights reserved.
-//
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface SCCommon : NSObject
-
+@interface CYCommon : NSObject
 
 + (UIImage*)createImageWithColor:(UIColor*)color size:(CGSize)imageSize;
 

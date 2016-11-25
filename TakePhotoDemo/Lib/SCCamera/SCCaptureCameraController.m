@@ -9,7 +9,7 @@
 #import "SCCaptureCameraController.h"
 //相机
 #import "SCCaptureSessionManager.h"
-#import "SCCommon.h"
+#import "CYCommon.h"
 //依赖库
 #import <Photos/Photos.h>
 #import "SVProgressHUD.h"
