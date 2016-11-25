@@ -11,7 +11,9 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
+#import <GLKit/GLKit.h>
 #import "SCDefines.h"
+
 
 @protocol SCCaptureSessionManager;
 
@@ -54,20 +56,34 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 /** 照片输出流 */
 @property (nonatomic, strong) AVCaptureStillImageOutput *stillImageOutput;
 
+/** 视频输出流 */
+@property (nonatomic, strong) AVCaptureVideoDataOutput *videoOutput;
+
 /** 预览图层 */
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
 
+/** 当前相机方向 */
+@property (nonatomic,assign) AVCaptureVideoOrientation videoOrientation;
 
-/* --------------pinch相关------------- */
+/* ---------------------------pinch相关------------------ */
 @property (nonatomic, assign, readonly) CGFloat preScaleNum;
+
 @property (nonatomic, assign, readonly) CGFloat scaleNum;
-/* ----------------------------------- */
+/* ------------------------------------------------------ */
 
 @property (nonatomic, assign) id <SCCaptureSessionManager> delegate;
 
 
+/* --------------------------thumbPreview相关------------------ */
+
+@property (nonatomic,strong) GLKView* thumbPreView;
+
+@property (nonatomic,strong) CIContext* cicontext;
+
+/* ------------------------------------------------------ */
+
 /** 初始化实时预览界面 */
-- (void)configureWithParentView:(UIView*)parentView previewRect:(CGRect)preivewRect;
+- (void)configureWithParentView:(UIView*)parentView previewRect:(CGRect)preivewRect thumbPreviewRect:(CGRect)thumbPreviewRect;
 
 /** 拍照 */
 - (void)takePicture:(DidCapturePhotoBlock)block;

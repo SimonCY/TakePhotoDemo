@@ -35,6 +35,6 @@ typedef NS_ENUM(NSUInteger, CameraContentViewBtnType) {
 
 @property (nonatomic,assign) preViewRota preRota;
 
-
 + (instancetype)contentView;
+
 @end

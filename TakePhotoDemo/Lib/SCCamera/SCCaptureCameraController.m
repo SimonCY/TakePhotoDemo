@@ -223,13 +223,17 @@ static CGFloat _rotationZ = 0;
      CGRect preViewRect = CGRectMake(0,0, SC_APP_SIZE.width, SC_DEVICE_SIZE.height);
     //初始化session manager
     SCCaptureSessionManager *manager = [[SCCaptureSessionManager alloc] init];
-    //初始化相机界面
+    //初始化相机预览界面
     if (CGRectEqualToRect(preViewRect, CGRectZero)) {
         preViewRect = CGRectMake(0, 64, SC_APP_SIZE.width, SC_DEVICE_SIZE.height- 64);
     }
-    [manager configureWithParentView:self.view previewRect:preViewRect];
+    [manager configureWithParentView:self.view previewRect:preViewRect thumbPreviewRect:CGRectMake(10, 50, 200,200)];
     self.captureManager = manager;
-     [self.captureManager.session startRunning];
+    //运行会话
+    if (!self.captureManager.session.isRunning) {
+        [self.captureManager.session startRunning];
+    }
+    
     //其他一些无聊的配置
     alphaTimes = -1;
     currTouchPoint = CGPointZero;
@@ -243,6 +247,7 @@ static CGFloat _rotationZ = 0;
     [self.view addSubview:contentView];
     self.contentView = contentView;
 }
+
 //对焦的框
 - (void)addFocusView {
     _focusImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"focus"]];

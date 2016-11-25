@@ -21,7 +21,6 @@
 		73E81E361DD956BE00DD1F7B /* rotaPreView.m in Sources */ = {isa = PBXBuildFile; fileRef = 73E81E351DD956BE00DD1F7B /* rotaPreView.m */; };
 		73EEBF911DD2F1AD00656464 /* SCCaptureCameraController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF841DD2F1AD00656464 /* SCCaptureCameraController.m */; };
 		73EEBF921DD2F1AD00656464 /* SCCaptureSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF861DD2F1AD00656464 /* SCCaptureSessionManager.m */; };
-		73EEBF931DD2F1AD00656464 /* SCNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF881DD2F1AD00656464 /* SCNavigationController.m */; };
 		73EEBF941DD2F1AD00656464 /* SCSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF8A1DD2F1AD00656464 /* SCSlider.m */; };
 		73EEBF951DD2F1AD00656464 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF8C1DD2F1AD00656464 /* UIImage+Resize.m */; };
 		73EEBF961DD2F1AD00656464 /* SCCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 73EEBF8F1DD2F1AD00656464 /* SCCommon.m */; };
@@ -76,8 +75,6 @@
 		73EEBF841DD2F1AD00656464 /* SCCaptureCameraController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCCaptureCameraController.m; sourceTree = "<group>"; };
 		73EEBF851DD2F1AD00656464 /* SCCaptureSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCCaptureSessionManager.h; sourceTree = "<group>"; };
 		73EEBF861DD2F1AD00656464 /* SCCaptureSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCCaptureSessionManager.m; sourceTree = "<group>"; };
-		73EEBF871DD2F1AD00656464 /* SCNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCNavigationController.h; sourceTree = "<group>"; };
-		73EEBF881DD2F1AD00656464 /* SCNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCNavigationController.m; sourceTree = "<group>"; };
 		73EEBF891DD2F1AD00656464 /* SCSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCSlider.h; sourceTree = "<group>"; };
 		73EEBF8A1DD2F1AD00656464 /* SCSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCSlider.m; sourceTree = "<group>"; };
 		73EEBF8B1DD2F1AD00656464 /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Resize.h"; sourceTree = "<group>"; };
@@ -207,8 +204,6 @@
 				73EEBF841DD2F1AD00656464 /* SCCaptureCameraController.m */,
 				73EEBF851DD2F1AD00656464 /* SCCaptureSessionManager.h */,
 				73EEBF861DD2F1AD00656464 /* SCCaptureSessionManager.m */,
-				73EEBF871DD2F1AD00656464 /* SCNavigationController.h */,
-				73EEBF881DD2F1AD00656464 /* SCNavigationController.m */,
 				73EEBF891DD2F1AD00656464 /* SCSlider.h */,
 				73EEBF8A1DD2F1AD00656464 /* SCSlider.m */,
 				73EEBF8B1DD2F1AD00656464 /* UIImage+Resize.h */,
@@ -388,7 +383,6 @@
 			files = (
 				732F9F3B1DD02C0A00D96865 /* ViewController.m in Sources */,
 				73EEBF911DD2F1AD00656464 /* SCCaptureCameraController.m in Sources */,
-				73EEBF931DD2F1AD00656464 /* SCNavigationController.m in Sources */,
 				73EEBF921DD2F1AD00656464 /* SCCaptureSessionManager.m in Sources */,
 				73EEBF951DD2F1AD00656464 /* UIImage+Resize.m in Sources */,
 				73EEBF961DD2F1AD00656464 /* SCCommon.m in Sources */,

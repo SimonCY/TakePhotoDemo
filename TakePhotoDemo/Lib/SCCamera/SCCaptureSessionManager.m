@@ -11,7 +11,7 @@
 #import "SCCommon.h"
 #import "UIImage+Resize.h"
 
-@interface SCCaptureSessionManager ()
+@interface SCCaptureSessionManager ()<AVCaptureVideoDataOutputSampleBufferDelegate>
 
 @property (nonatomic, strong) UIView *preview;
  
@@ -41,7 +41,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)configureWithParentView:(UIView*)parentView previewRect:(CGRect)preivewRect {
+- (void)configureWithParentView:(UIView*)parentView previewRect:(CGRect)preivewRect thumbPreviewRect:(CGRect)thumbPreviewRect {
     
     self.preview = parentView;
     
@@ -59,6 +59,9 @@
     
     //5、output （默认是相机）
     [self addStillImageOutput];
+    
+    //6、thumbPreView
+    [self addThumbPreViewWithParentView:parentView thumbPreviewRect:thumbPreviewRect];
 }
 
 /** 创建相机操作队列，防止阻塞主线程 */
@@ -164,7 +167,7 @@
     
     AVCaptureStillImageOutput *tmpOutput = [[AVCaptureStillImageOutput alloc] init];
     //输出jpeg图像
-    NSDictionary *outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys:AVVideoCodecJPEG,AVVideoCodecKey,nil];
+    NSDictionary *outputSettings = @{AVVideoCodecKey : AVVideoCodecJPEG};
     tmpOutput.outputSettings = outputSettings;
     
     if ([_session canAddOutput:tmpOutput]) {
@@ -174,6 +177,45 @@
     }
     
 }
+
+- (void)addThumbPreViewWithParentView:parentView thumbPreviewRect:(CGRect)thumbPreviewRect {
+    
+    // 视频输出
+    AVCaptureVideoDataOutput *videoOut = [[AVCaptureVideoDataOutput alloc] init];
+    [videoOut setAlwaysDiscardsLateVideoFrames:YES];
+    [videoOut setVideoSettings:@{(id)kCVPixelBufferPixelFormatTypeKey : [NSNumber numberWithInt:kCVPixelFormatType_32BGRA]}];
+    [videoOut setSampleBufferDelegate:self queue:self.sessionQueue];
+    if ([_session canAddOutput:videoOut]){
+        [_session addOutput:videoOut];
+        self.videoOutput = videoOut;
+    }
+    
+    // 设置视频捕捉连接
+    AVCaptureConnection *videoConnection = [videoOut connectionWithMediaType:AVMediaTypeVideo];
+    videoConnection.videoOrientation = AVCaptureVideoOrientationPortrait;
+    
+    EAGLContext *context = [[EAGLContext alloc]initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    _thumbPreView = [[GLKView alloc]initWithFrame:thumbPreviewRect context:context];
+    [EAGLContext setCurrentContext:context];
+    [parentView addSubview:_thumbPreView];
+    _cicontext = [CIContext contextWithEAGLContext:context];
+    
+}
+
+// 在视频输出函数中绘制出来
+-(void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *)connection {
+
+     if (_thumbPreView.context != [EAGLContext currentContext]) {
+        [EAGLContext setCurrentContext:_thumbPreView.context];
+    }
+    
+    CVImageBufferRef imageRef = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CIImage *image = [CIImage imageWithCVImageBuffer:imageRef];
+    [_thumbPreView bindDrawable];
+    [_cicontext drawImage:image inRect:CGRectMake(0, 0, _thumbPreView.bounds.size.width * 2, _thumbPreView.bounds.size.height * 2) fromRect:image.extent];
+    [_thumbPreView display];
+}
+
 
 #pragma mark - set and get
 - (AVCaptureFlashMode)flashMode {
@@ -185,6 +227,18 @@
     }
     return AVCaptureFlashModeOff;
 }
+- (void)setVideoOrientation:(AVCaptureVideoOrientation)videoOrientation {
+    _videoOrientation = videoOrientation;
+    
+    AVCaptureConnection *stillImageConnection = [self findCaptureConnectionFromStillImageOutput];
+    stillImageConnection.videoOrientation = videoOrientation;
+    
+    AVCaptureConnection *videoConnection = [self findCaptureConnectionFromVideoOutput];
+    videoConnection.videoOrientation = videoOrientation;
+    
+    AVCaptureConnection *previewConnection = [self.previewLayer connection];
+    previewConnection.videoOrientation = videoOrientation;
+}
 
 #pragma mark - camera actions
 
@@ -192,11 +246,19 @@
  * 拍照
  */
 - (void)takePicture:(DidCapturePhotoBlock)block {
-    AVCaptureConnection *videoConnection = [self findVideoConnection];
+    AVCaptureConnection *videoConnection = [self findCaptureConnectionFromStillImageOutput];
 
     [videoConnection setVideoScaleAndCropFactor:_scaleNum];
     
+    if (videoConnection.isVideoOrientationSupported) {
+        videoConnection.videoOrientation = [self videoOrientation];
+    }
+    
     [_stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+        
+        if (imageDataSampleBuffer == NULL || error) {
+            SCDLog(@"取图片时发生错误");
+        }
         
         //将imageDataSampleBuffer处理成image
         CFDictionaryRef exifAttachments = CMGetAttachment(imageDataSampleBuffer, kCGImagePropertyExifDictionary, NULL);
@@ -304,7 +366,7 @@
 
 - (void)doPinch {
  
-    AVCaptureConnection *videoConnection = [self findVideoConnection];
+    AVCaptureConnection *videoConnection = [self findCaptureConnectionFromStillImageOutput];
     
     CGFloat maxScale = videoConnection.videoMaxScaleAndCropFactor;//videoScaleAndCropFactor这个属性取值范围是1.0-videoMaxScaleAndCropFactor。iOS5+才可以用
     if (_scaleNum > maxScale) {
@@ -314,7 +376,7 @@
         _scaleNum = 1.f;
     }
     
-    //
+    //在拍照时做的这一步
 //    videoConnection.videoScaleAndCropFactor = _scaleNum;
     
     //缩放预览图层尺寸
@@ -492,7 +554,7 @@
 #pragma mark ---------------private--------------
 
 /** 根据设备方向获取相机方向 */
-- (AVCaptureVideoOrientation)avOrientationForDeviceOrientation:(UIDeviceOrientation)deviceOrientation {
+- (AVCaptureVideoOrientation)videoOrientationForDeviceOrientation:(UIDeviceOrientation)deviceOrientation {
     AVCaptureVideoOrientation result = (AVCaptureVideoOrientation)deviceOrientation;
     if ( deviceOrientation == UIDeviceOrientationLandscapeLeft )
         result = AVCaptureVideoOrientationLandscapeRight;
@@ -503,8 +565,7 @@
 
 //屏幕旋转时调整视频预览图层的方向
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    AVCaptureConnection *captureConnection=[self.previewLayer connection];
-    captureConnection.videoOrientation = (AVCaptureVideoOrientation)toInterfaceOrientation;
+    self.videoOrientation = [self videoOrientationForDeviceOrientation:(UIDeviceOrientation)toInterfaceOrientation];
 }
 
 //旋转后重新设置大小
@@ -513,8 +574,8 @@
 }
 
 
-/** 得到设备连接 */
-- (AVCaptureConnection*)findVideoConnection {
+/** 得到相机输出的设备连接 （相机专用） */
+- (AVCaptureConnection*)findCaptureConnectionFromStillImageOutput {
     AVCaptureConnection *videoConnection = nil;
 	for (AVCaptureConnection *connection in _stillImageOutput.connections) {
 		for (AVCaptureInputPort *port in connection.inputPorts) {
@@ -530,6 +591,21 @@
     return videoConnection;
 }
 
-
+/** 得到视频输出的设备连接 （视频专用）*/
+- (AVCaptureConnection*)findCaptureConnectionFromVideoOutput {
+    AVCaptureConnection *videoConnection = nil;
+    for (AVCaptureConnection *connection in _videoOutput.connections) {
+        for (AVCaptureInputPort *port in connection.inputPorts) {
+            if ([[port mediaType] isEqual:AVMediaTypeVideo]) {
+                videoConnection = connection;
+                break;
+            }
+        }
+        if (videoConnection) {
+            break;
+        }
+    }
+    return videoConnection;
+}
 
 @end

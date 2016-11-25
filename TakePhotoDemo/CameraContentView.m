@@ -14,6 +14,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *switchCameraBtn;
 @property (weak, nonatomic) IBOutlet UIView *rotationPreView;
 
+
 @end
 @implementation CameraContentView
 + (instancetype)contentView {
