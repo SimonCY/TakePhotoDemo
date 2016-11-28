@@ -35,7 +35,7 @@
     if (self = [super init]) {
         _scaleNum = 1.f;
         _preScaleNum = 1.f;
-        
+        _videoOrientation = AVCaptureVideoOrientationPortrait;
     }
     return self;
 }
@@ -164,6 +164,7 @@
 
 - (void)addThumbPreViewWithParentView:parentView thumbPreviewRect:(CGRect)thumbPreviewRect {
     
+    
     // 视频输出
     AVCaptureVideoDataOutput *videoOut = [[AVCaptureVideoDataOutput alloc] init];
     [videoOut setAlwaysDiscardsLateVideoFrames:YES];
@@ -186,11 +187,15 @@
     
 }
 
-#pragma mark - videoOutputDelegate
+#pragma mark - videoOutput Delegate
 
 /** 取得视频每帧静态图 */
 -(void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *)connection {
 
+    if (!_thumbPreView.superview) {
+        return;
+    }
+    
     if ([UIDevice currentDevice].systemVersion.floatValue < 9) {
         [_thumbPreView removeFromSuperview];
         _thumbPreView = nil;
@@ -532,9 +537,16 @@
 
 //旋转后重新设置大小
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    self.previewLayer.frame= self.parentView.bounds;
+//    self.previewLayer.frame= self.parentView.bounds;
 }
 
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+//        if ((toInterfaceOrientation == UIDeviceOrientationLandscapeLeft) || (toInterfaceOrientation == UIDeviceOrientationLandscapeRight)) {
+//            self.previewLayer.frame= CGRectMake(0, 0, (SCREEN_HEIGHT_CY > SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY, (SCREEN_HEIGHT_CY < SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY);
+//        } else {
+//            self.previewLayer.frame= CGRectMake(0, 0, (SCREEN_HEIGHT_CY < SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY, (SCREEN_HEIGHT_CY > SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY);
+//        }
+}
 #pragma mark ---------------private--------------
 
 /** 根据设备方向获取相机方向 */

@@ -122,9 +122,9 @@
 		732104EE1DE841BA00FA2E8A /* CYCommon */ = {
 			isa = PBXGroup;
 			children = (
+				732104EF1DE841BA00FA2E8A /* iPhoneMacro.h */,
 				732104F31DE841D900FA2E8A /* UIImage+CYExtension.h */,
 				732104F41DE841D900FA2E8A /* UIImage+CYExtension.m */,
-				732104EF1DE841BA00FA2E8A /* iPhoneMacro.h */,
 				732104F01DE841BA00FA2E8A /* CYCommon.h */,
 				732104F11DE841BA00FA2E8A /* CYCommon.m */,
 			);

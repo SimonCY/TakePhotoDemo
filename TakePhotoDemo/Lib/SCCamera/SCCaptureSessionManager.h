@@ -61,7 +61,7 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 /** 会话对象，执行输入设备和输出设备之间的数据传递 */
 @property (nonatomic, strong) AVCaptureSession *session;
 
-/** 输入设备（前或者后摄像头） */
+/** 输入设备 */
 @property (nonatomic, strong) AVCaptureDeviceInput *inputDevice;
 
 /** 照片输出流 */
@@ -111,11 +111,11 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 
 /** 对焦 */
 - (void)focusInPoint:(CGPoint)devicePoint;
-
+/** 得到当前启用的摄像头，没有返回nil */
 
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration;
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation;
-
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration;
 @end
 
 

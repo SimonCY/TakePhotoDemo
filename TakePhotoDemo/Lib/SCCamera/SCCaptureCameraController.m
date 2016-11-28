@@ -197,18 +197,23 @@ static CGFloat _rotationZ = 0;
 #pragma mark - 屏幕旋转
 //屏幕旋转时调整视频预览图层的方向
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration{
-    if ([self.captureManager respondsToSelector:@selector(willRotateToInterfaceOrientation:duration:)]) {
+    if (self.captureManager && [self.captureManager respondsToSelector:@selector(willRotateToInterfaceOrientation:duration:)]) {
         [self.captureManager willRotateToInterfaceOrientation:toInterfaceOrientation duration:duration];
     }
 }
 
 //旋转后重新设置大小
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
-    if ([self.captureManager respondsToSelector:@selector(didRotateFromInterfaceOrientation:)]) {
+    if (self.captureManager && [self.captureManager respondsToSelector:@selector(didRotateFromInterfaceOrientation:)]) {
         [self.captureManager didRotateFromInterfaceOrientation:fromInterfaceOrientation];
     }
 }
 
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    if (self.captureManager && [self.captureManager respondsToSelector:@selector(willAnimateRotationToInterfaceOrientation:duration:)]) {
+        [self.captureManager willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+    }
+}
 #pragma mark - init
 - (void)loadCameraUI {
     //相机按钮界面
@@ -255,7 +260,7 @@ static CGFloat _rotationZ = 0;
     [self.view addSubview:_focusImageView];
     
 #if SWITCH_SHOW_FOCUSVIEW_UNTIL_FOCUS_DONE
-    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    AVCaptureDevice *device = [self.captureManager activeCamera];
     if (device && [device isFocusPointOfInterestSupported]) {
         [device addObserver:self forKeyPath:ADJUSTINT_FOCUS options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
     }
@@ -392,29 +397,30 @@ static CGFloat _rotationZ = 0;
     
 }
 
-/**
- *  切成正方形   只适合处理屏幕大小的图片（未缩放）
- */
-- (UIImage *)cutImage:(UIImage *)sourceImage With:(CGRect)usebleRect{
-    // CGImageCreateWithImageInRect只认像素
-    
-    
-    CGFloat newX = 0;
-    CGFloat newY = (sourceImage.size.height - sourceImage.size.width) / 2;
-    CGFloat newW = sourceImage.size.width;
-    CGFloat newH = newW;
-    CGImageRef newImageRef = CGImageCreateWithImageInRect(sourceImage.CGImage, CGRectMake(newX,newY, newW , newH));
-    UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
-     CGImageRelease(newImageRef);
-    NSLog(@"newImage size is %@ ,scale is %f",[NSValue valueWithCGSize:newImage.size],[UIScreen mainScreen].scale);
 
-    if (newImage == nil) {
-        NSLog(@"裁图失败");
+
+- (CGFloat)angleOffsetFromPortraitOrientationToOrientation:(AVCaptureVideoOrientation)orientation
+{
+    CGFloat angle = 0.0;
+    switch (orientation)
+    {
+        case AVCaptureVideoOrientationPortrait:
+            angle = 0.0;
+            break;
+        case AVCaptureVideoOrientationPortraitUpsideDown:
+            angle = M_PI;
+            break;
+        case AVCaptureVideoOrientationLandscapeRight:
+            angle = -M_PI_2;
+            break;
+        case AVCaptureVideoOrientationLandscapeLeft:
+            angle = M_PI_2;
+            break;
+        default:
+            break;
     }
-    return newImage;
+    return angle;
 }
-
-
 @end
 
 
