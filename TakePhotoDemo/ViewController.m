@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "SCCaptureCameraController.h"
+#import "rotaPreView.h"
 
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UIButton *photoBtn;

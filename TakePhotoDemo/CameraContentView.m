@@ -7,6 +7,7 @@
 //
 
 #import "CameraContentView.h"
+#import "rotaPreView.h"
 
 @interface CameraContentView()
 @property (weak, nonatomic) IBOutlet UIButton *dismissBtn;
@@ -72,6 +73,7 @@
     
     [self.rotationPreView.layer addAnimation:group forKey:nil];
 }
+
 #pragma mark - clickevents
 - (void)takePhotoBtnClicked:(UIButton *)btn {
     if (self.delegate && [self.delegate respondsToSelector:@selector(cameraContentView:didClickBtn:withType:)]) {

@@ -40,5 +40,11 @@
 /** 旋转指定角度 */
 - (UIImage *)rotatedByDegrees:(CGFloat)degrees;
 
+#pragma mark - 类方法
++ (UIImage*)createImageWithColor:(UIColor*)color size:(CGSize)imageSize;
+
++ (void)drawALineWithFrame:(CGRect)frame andColor:(UIColor*)color inLayer:(CALayer*)parentLayer;
+
++ (void)saveImageToPhotoAlbum:(UIImage*)image;
 
 @end

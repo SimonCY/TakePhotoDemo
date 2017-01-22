@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		732104F21DE841BA00FA2E8A /* CYCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 732104F11DE841BA00FA2E8A /* CYCommon.m */; };
 		732104F51DE841D900FA2E8A /* UIImage+CYExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 732104F41DE841D900FA2E8A /* UIImage+CYExtension.m */; };
 		732104F81DE842D100FA2E8A /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 732104F71DE842D100FA2E8A /* CoreImage.framework */; };
 		732F9F351DD02C0A00D96865 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 732F9F341DD02C0A00D96865 /* main.m */; };
@@ -50,8 +49,6 @@
 
 /* Begin PBXFileReference section */
 		732104EF1DE841BA00FA2E8A /* iPhoneMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iPhoneMacro.h; sourceTree = "<group>"; };
-		732104F01DE841BA00FA2E8A /* CYCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYCommon.h; sourceTree = "<group>"; };
-		732104F11DE841BA00FA2E8A /* CYCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYCommon.m; sourceTree = "<group>"; };
 		732104F31DE841D900FA2E8A /* UIImage+CYExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+CYExtension.h"; sourceTree = "<group>"; };
 		732104F41DE841D900FA2E8A /* UIImage+CYExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CYExtension.m"; sourceTree = "<group>"; };
 		732104F71DE842D100FA2E8A /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
@@ -125,8 +122,6 @@
 				732104EF1DE841BA00FA2E8A /* iPhoneMacro.h */,
 				732104F31DE841D900FA2E8A /* UIImage+CYExtension.h */,
 				732104F41DE841D900FA2E8A /* UIImage+CYExtension.m */,
-				732104F01DE841BA00FA2E8A /* CYCommon.h */,
-				732104F11DE841BA00FA2E8A /* CYCommon.m */,
 			);
 			path = CYCommon;
 			sourceTree = "<group>";
@@ -395,7 +390,6 @@
 			files = (
 				732F9F3B1DD02C0A00D96865 /* ViewController.m in Sources */,
 				73EEBF911DD2F1AD00656464 /* SCCaptureCameraController.m in Sources */,
-				732104F21DE841BA00FA2E8A /* CYCommon.m in Sources */,
 				73EEBF921DD2F1AD00656464 /* SCCaptureSessionManager.m in Sources */,
 				732F9F381DD02C0A00D96865 /* AppDelegate.m in Sources */,
 				732104F51DE841D900FA2E8A /* UIImage+CYExtension.m in Sources */,
