@@ -205,7 +205,7 @@
      if (_thumbPreView.context != [EAGLContext currentContext]) {
         [EAGLContext setCurrentContext:_thumbPreView.context];
     }
-    
+
     CVImageBufferRef imageRef = CMSampleBufferGetImageBuffer(sampleBuffer);
     CIImage *image = [CIImage imageWithCVImageBuffer:imageRef];
     [_thumbPreView bindDrawable];

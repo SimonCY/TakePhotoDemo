@@ -46,5 +46,6 @@
 + (void)drawALineWithFrame:(CGRect)frame andColor:(UIColor*)color inLayer:(CALayer*)parentLayer;
 
 + (void)saveImageToPhotoAlbum:(UIImage*)image;
-
+/** 生成高斯模糊图片 */
++ (void)imageCoreBlurImage:(UIImage *)image withBlurNumber:(CGFloat)blur backImage:(void(^)(UIImage *image))backImage;
 @end

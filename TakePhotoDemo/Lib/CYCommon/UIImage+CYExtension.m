@@ -7,6 +7,7 @@
 //
 
 #import "UIImage+CYExtension.h"
+#import <Accelerate/Accelerate.h>
 #import "iPhoneMacro.h"
 
 @implementation UIImage (Resize)
@@ -377,6 +378,102 @@ static inline CGFloat DegreesToRadians(CGFloat degrees) {
         CYLog(@"保存成功");
     }
 }
+
++ (void)imageCoreBlurImage:(UIImage *)image withBlurNumber:(CGFloat)blur backImage:(void (^)(UIImage *))backImage{
+    
+    if (blur < 0.f || blur > 1.f) {
+        blur = 0.5f;
+    }
+    int boxSize = (int)(blur * 40);
+    boxSize = boxSize - (boxSize % 2) + 1;
+    
+    CGImageRef img = image.CGImage;
+    
+    vImage_Buffer inBuffer, outBuffer;
+    vImage_Error error;
+    
+    void *pixelBuffer;
+    //从CGImage中获取数据
+    CGDataProviderRef inProvider = CGImageGetDataProvider(img);
+    CFDataRef inBitmapData = CGDataProviderCopyData(inProvider);
+    //设置从CGImage获取对象的属性
+    inBuffer.width = CGImageGetWidth(img);
+    inBuffer.height = CGImageGetHeight(img);
+    inBuffer.rowBytes = CGImageGetBytesPerRow(img);
+    
+    inBuffer.data = (void*)CFDataGetBytePtr(inBitmapData);
+    
+    pixelBuffer = malloc(CGImageGetBytesPerRow(img) *
+                         CGImageGetHeight(img));
+    
+    if(pixelBuffer == NULL)
+        NSLog(@"No pixelbuffer");
+    
+    outBuffer.data = pixelBuffer;
+    outBuffer.width = CGImageGetWidth(img);
+    outBuffer.height = CGImageGetHeight(img);
+    outBuffer.rowBytes = CGImageGetBytesPerRow(img);
+    
+    error = vImageBoxConvolve_ARGB8888(&inBuffer, &outBuffer, NULL, 0, 0, boxSize, boxSize, NULL, kvImageEdgeExtend);
+    
+    if (error) {
+        NSLog(@"error from convolution %ld", error);
+    }
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef ctx = CGBitmapContextCreate(
+                                             outBuffer.data,
+                                             outBuffer.width,
+                                             outBuffer.height,
+                                             8,
+                                             outBuffer.rowBytes,
+                                             colorSpace,
+                                             kCGImageAlphaNoneSkipLast);
+    CGImageRef imageRef = CGBitmapContextCreateImage (ctx);
+    UIImage *returnImage = [UIImage imageWithCGImage:imageRef];
+    
+    //clean up
+    CGContextRelease(ctx);
+    CGColorSpaceRelease(colorSpace);
+    
+    free(pixelBuffer);
+    CFRelease(inBitmapData);
+    
+    CGColorSpaceRelease(colorSpace);
+    CGImageRelease(imageRef);
+    if (backImage) {
+        backImage(returnImage);
+    }
+}
+
++ (Byte *)imageToBuffer:(UIImage *)image {
+
+    CGImageRef inputCGImage = [image CGImage];
+    NSUInteger width =                 CGImageGetWidth(inputCGImage);
+    NSUInteger height = CGImageGetHeight(inputCGImage);
+    
+    // 2.
+    NSUInteger bytesPerPixel = 4;   //rgba是4 rgb是3 灰度图是1
+    NSUInteger bytesPerRow = bytesPerPixel *     width;
+    NSUInteger bitsPerComponent = 8;
+    
+    Byte * pixels;
+    pixels = (Byte *) calloc(height * width,     sizeof(UInt32));
+    
+    // 3.
+    CGColorSpaceRef colorSpace =     CGColorSpaceCreateDeviceRGB();
+    CGContextRef context =     CGBitmapContextCreate(pixels, width, height,     bitsPerComponent, bytesPerRow, colorSpace,     kCGImageAlphaPremultipliedLast |     kCGBitmapByteOrder32Big);
+    
+    // 4.
+    CGContextDrawImage(context, CGRectMake(0,     0, width, height), inputCGImage);
+//    CGImageRef imageRef = CGBitmapContextCreateImage (context);
+//    UIImage *returnImage = [UIImage imageWithCGImage:imageRef];
+    // 5. Cleanup
+    CGColorSpaceRelease(colorSpace); 
+    CGContextRelease(context);
+    return pixels;
+}
+
 
 
 @end
