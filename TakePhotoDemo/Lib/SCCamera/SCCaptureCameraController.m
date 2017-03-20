@@ -52,6 +52,8 @@
 }
 
 #pragma mark - 陀螺仪相关
+
+
 -(CMMotionManager *)motionManager {
     if (!_motionManager) {
         _motionManager = [[CMMotionManager alloc] init];
@@ -197,22 +199,22 @@ static CGFloat _rotationZ = 0;
 #pragma mark - 屏幕旋转
 //屏幕旋转时调整视频预览图层的方向
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration{
-    if (self.captureManager && [self.captureManager respondsToSelector:@selector(willRotateToInterfaceOrientation:duration:)]) {
-        [self.captureManager willRotateToInterfaceOrientation:toInterfaceOrientation duration:duration];
-    }
+//    if (self.captureManager && [self.captureManager respondsToSelector:@selector(willRotateToInterfaceOrientation:duration:)]) {
+//        [self.captureManager willRotateToInterfaceOrientation:toInterfaceOrientation duration:duration];
+//    }
 }
 
 //旋转后重新设置大小
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
-    if (self.captureManager && [self.captureManager respondsToSelector:@selector(didRotateFromInterfaceOrientation:)]) {
-        [self.captureManager didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-    }
+//    if (self.captureManager && [self.captureManager respondsToSelector:@selector(didRotateFromInterfaceOrientation:)]) {
+//        [self.captureManager didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+//    }
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    if (self.captureManager && [self.captureManager respondsToSelector:@selector(willAnimateRotationToInterfaceOrientation:duration:)]) {
-        [self.captureManager willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
-    }
+//    if (self.captureManager && [self.captureManager respondsToSelector:@selector(willAnimateRotationToInterfaceOrientation:duration:)]) {
+//        [self.captureManager willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+//    }
 }
 #pragma mark - init
 - (void)loadCameraUI {

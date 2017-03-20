@@ -15,6 +15,7 @@
 		732F9F401DD02C0A00D96865 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 732F9F3F1DD02C0A00D96865 /* Assets.xcassets */; };
 		732F9F4E1DD02C0A00D96865 /* TakePhotoDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 732F9F4D1DD02C0A00D96865 /* TakePhotoDemoTests.m */; };
 		732F9F591DD02C0A00D96865 /* TakePhotoDemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 732F9F581DD02C0A00D96865 /* TakePhotoDemoUITests.m */; };
+		737104271E76B0B1007341BF /* NavViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 737104261E76B0B1007341BF /* NavViewController.m */; };
 		73A590161DD995710015C973 /* PositionPreView.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A590151DD995710015C973 /* PositionPreView.m */; };
 		73B45DCD1DD17E7000D8E531 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 73B45DCC1DD17E7000D8E531 /* Default-568h@2x.png */; };
 		73B45DCF1DD17FB700D8E531 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 73B45DCE1DD17FB700D8E531 /* ViewController.xib */; };
@@ -66,6 +67,8 @@
 		732F9F541DD02C0A00D96865 /* TakePhotoDemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TakePhotoDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		732F9F581DD02C0A00D96865 /* TakePhotoDemoUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TakePhotoDemoUITests.m; sourceTree = "<group>"; };
 		732F9F5A1DD02C0A00D96865 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		737104251E76B0B1007341BF /* NavViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavViewController.h; sourceTree = "<group>"; };
+		737104261E76B0B1007341BF /* NavViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavViewController.m; sourceTree = "<group>"; };
 		73A590141DD995700015C973 /* PositionPreView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PositionPreView.h; sourceTree = "<group>"; };
 		73A590151DD995710015C973 /* PositionPreView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PositionPreView.m; sourceTree = "<group>"; };
 		73B45DCC1DD17E7000D8E531 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
@@ -161,6 +164,8 @@
 			children = (
 				732F9F361DD02C0A00D96865 /* AppDelegate.h */,
 				732F9F371DD02C0A00D96865 /* AppDelegate.m */,
+				737104251E76B0B1007341BF /* NavViewController.h */,
+				737104261E76B0B1007341BF /* NavViewController.m */,
 				732F9F391DD02C0A00D96865 /* ViewController.h */,
 				732F9F3A1DD02C0A00D96865 /* ViewController.m */,
 				73B45DCE1DD17FB700D8E531 /* ViewController.xib */,
@@ -394,6 +399,7 @@
 				732F9F381DD02C0A00D96865 /* AppDelegate.m in Sources */,
 				732104F51DE841D900FA2E8A /* UIImage+CYExtension.m in Sources */,
 				73EEBFA71DD2F52400656464 /* CYDeviceManager.m in Sources */,
+				737104271E76B0B1007341BF /* NavViewController.m in Sources */,
 				73E81E361DD956BE00DD1F7B /* rotaPreView.m in Sources */,
 				73EEBFA31DD2F2E000656464 /* SVProgressHUD.m in Sources */,
 				73EEBF941DD2F1AD00656464 /* SCSlider.m in Sources */,

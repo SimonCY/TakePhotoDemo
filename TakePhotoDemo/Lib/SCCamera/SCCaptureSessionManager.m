@@ -537,15 +537,15 @@
 
 //旋转后重新设置大小
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-//    self.previewLayer.frame= self.parentView.bounds;
+    self.previewLayer.frame= self.parentView.bounds;
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-//        if ((toInterfaceOrientation == UIDeviceOrientationLandscapeLeft) || (toInterfaceOrientation == UIDeviceOrientationLandscapeRight)) {
-//            self.previewLayer.frame= CGRectMake(0, 0, (SCREEN_HEIGHT_CY > SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY, (SCREEN_HEIGHT_CY < SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY);
-//        } else {
-//            self.previewLayer.frame= CGRectMake(0, 0, (SCREEN_HEIGHT_CY < SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY, (SCREEN_HEIGHT_CY > SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY);
-//        }
+        if ((toInterfaceOrientation == UIDeviceOrientationLandscapeLeft) || (toInterfaceOrientation == UIDeviceOrientationLandscapeRight)) {
+            self.previewLayer.frame= CGRectMake(0, 0, (SCREEN_HEIGHT_CY > SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY, (SCREEN_HEIGHT_CY < SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY);
+        } else {
+            self.previewLayer.frame= CGRectMake(0, 0, (SCREEN_HEIGHT_CY < SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY, (SCREEN_HEIGHT_CY > SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY);
+        }
 }
 #pragma mark ---------------private--------------
 
