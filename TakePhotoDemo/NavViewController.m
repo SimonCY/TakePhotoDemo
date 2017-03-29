@@ -8,8 +8,8 @@
 
 #import "NavViewController.h"
 
-@interface NavViewController ()
 
+@interface NavViewController ()
 @end
 
 @implementation NavViewController
@@ -17,10 +17,5 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    
 }
-//- (BOOL)shouldAutorotate {
-//    return NO;
-//}
-
 @end

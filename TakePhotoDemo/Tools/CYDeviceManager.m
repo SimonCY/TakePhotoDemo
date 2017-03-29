@@ -9,9 +9,111 @@
 #import "CYDeviceManager.h"
 #import <mach/mach.h>
 #import "sys/utsname.h"
+#import <CoreMotion/CoreMotion.h>
+
+@interface CYDeviceManager () {
+    
+    CYDeviceOrientation _direction;
+    
+}
+@end
+
+static CMMotionManager *_motionManager;
+
+//sensitive 灵敏度
+static const float sensitive = 0.77;
 
 @implementation CYDeviceManager
 
+#pragma mark - 设备方向监听
+
+- (instancetype)initWithDelegate:(id<DeviceOrientationDelegate>)delegate {
+    self = [super init];
+    if (self) {
+        
+        _delegate = delegate;
+    }
+    return self;
+}
+
+- (void)startOrientationUpdate {
+    
+    if (_motionManager == nil) {
+        
+        _motionManager = [[CMMotionManager alloc] init];
+    }
+    _motionManager.deviceMotionUpdateInterval = 1/5.f;
+    if (_motionManager.deviceMotionAvailable) {
+        
+        [_motionManager startDeviceMotionUpdatesToQueue:[NSOperationQueue mainQueue]
+                                            withHandler: ^(CMDeviceMotion *motion, NSError *error){
+                                                [self performSelectorOnMainThread:@selector(motionUpdated:) withObject:motion waitUntilDone:YES];
+                                            }];
+    }
+}
+
+- (void)stopOrientationUpdate {
+    
+    [_motionManager stopDeviceMotionUpdates];
+}
+
+- (CYDeviceOrientation)currentOrientation {
+    if (_motionManager == nil) {
+        
+        _motionManager = [[CMMotionManager alloc] init];
+    }
+    if ([_motionManager isDeviceMotionAvailable]) {
+        
+        return [self orientationFromMotion:[_motionManager deviceMotion]];
+    }
+    return CYDeviceOrientationUnkown;
+}
+
+- (void)motionUpdated:(CMDeviceMotion *)motion{
+    
+    CYDeviceOrientation newOrientation = [self orientationFromMotion:motion];
+    if (_direction != newOrientation) {
+        
+        _direction = newOrientation;
+        if (self.delegate && [self.delegate respondsToSelector:@selector(deviceDidChangedToOrientation:)]) {
+            [self.delegate deviceDidChangedToOrientation:_direction];
+        }
+    }
+}
+
+
+- (CYDeviceOrientation)orientationFromMotion:(CMDeviceMotion *)motion {
+    
+    double x = motion.gravity.x;
+    double y = motion.gravity.y;
+    
+    if (y < 0) {
+        if (fabs(y) > sensitive) {
+
+            return CYDeviceOrientationPortrait;
+        }
+    }else {
+        if (y > sensitive) {
+ 
+            return CYDeviceOrientationUpsideDown;
+        }
+    }
+    if (x < 0) {
+        if (fabs(x) > sensitive) {
+            
+            return CYDeviceOrientationLandscapeRight;
+        }
+    }else {
+        if (x > sensitive) {
+            
+            return CYDeviceOrientationLandscapeLeft;
+        }
+    }
+    return CYDeviceOrientationUnkown;
+}
+
+
+#pragma mark - 其他系统相关功能
 //获取设备内存信息，大小M
 + (NSUInteger)getDeviceTotalMemorySize{
     

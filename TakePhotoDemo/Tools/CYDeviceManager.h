@@ -8,8 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#ifndef KCOMMON_DEVICE_CATEGORY
-#define KCOMMON_DEVICE_CATEGORY
+
 typedef enum{
     //iPhone
     DeviceCategoryIPhone2G,
@@ -39,16 +38,44 @@ typedef enum{
     DeviceCategoryIPhoneSimulator,
     DeviceCategoryOther
 }DeviceCategory;
-#endif
+
+typedef NS_ENUM(NSInteger,CYDeviceOrientation) {
+    CYDeviceOrientationUnkown,
+    CYDeviceOrientationPortrait,
+    CYDeviceOrientationUpsideDown,
+    CYDeviceOrientationLandscapeRight,
+    CYDeviceOrientationLandscapeLeft,
+};
+
+//此监听设备方向变化的回调关闭系统转屏时也会生效，但是功能比较单一，最适合在相机界面旋转上使用
+@protocol DeviceOrientationDelegate <NSObject>
+
+- (void)deviceDidChangedToOrientation:(CYDeviceOrientation)orientation;
+
+@end
+
 
 @interface CYDeviceManager : NSObject
+
+@property(nonatomic,strong)id<DeviceOrientationDelegate>delegate;
+
+- (instancetype)initWithDelegate:(id<DeviceOrientationDelegate>)delegate;
+/** 开启方向监听 */
+- (void)startOrientationUpdate;
+/** 结束方向监听 */
+- (void)stopOrientationUpdate;
+/** 获取当前设备方向，未开启监听也可正常获取 */
+- (CYDeviceOrientation)currentOrientation;
+
 
 /** 获取设备总内存大小 mb */
 + (NSUInteger)getDeviceTotalMemorySize;
 /** 获取设备可用内存大小 mb */
 + (NSUInteger)getDeviceAvailableMemorySize;
-
+/** 电量 */
 + (CGFloat)getBatteryLevel;
+
+/** 系统版本 */
 + (NSString *)getOSVersonString;
 + (DeviceCategory)getDeviceCategory;
 @end

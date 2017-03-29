@@ -17,8 +17,9 @@
 #import <CoreMotion/CoreMotion.h>
 //自定义
 #import "CameraContentView.h"
+#import "CYDeviceManager.h"
 
-
+#import "UIImage+CYExtension.h"
 //对焦框是否一直闪到对焦完成
 #define SWITCH_SHOW_FOCUSVIEW_UNTIL_FOCUS_DONE 0
 //对焦
@@ -26,19 +27,23 @@
 #define LOW_ALPHA   0.7f
 #define HIGH_ALPHA  1.0f
 
-@interface SCCaptureCameraController ()<UIImagePickerControllerDelegate, UINavigationControllerDelegate,CameraContentViewDelegate>
+
+
+@interface SCCaptureCameraController ()<UIImagePickerControllerDelegate, UINavigationControllerDelegate,CameraContentViewDelegate,DeviceOrientationDelegate>
 {
     //对焦相关
     int alphaTimes;
     CGPoint currTouchPoint;
     UIImageView *_focusImageView;
+    CGFloat _shouldRotaDegrees;
 }
 
+@property (nonatomic,strong) CYDeviceManager* deviceManager;
 @property (nonatomic, strong) SCCaptureSessionManager *captureManager;
 /** 保存界面按钮的集合 （用处在于处理相机旋转方面）*/
 @property (nonatomic, strong) NSMutableSet *cameraBtnSet;
 /** 相机界面 */
-@property (nonatomic,weak) CameraContentView* contentView;
+@property (nonatomic,weak) CameraContentView * contentView;
 
 
 @property (strong,nonatomic) CMMotionManager *motionManager;
@@ -134,6 +139,10 @@ static CGFloat _rotationZ = 0;
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     
     [self pullByDeviceMotion];
+    
+    self.deviceManager = [[CYDeviceManager alloc] initWithDelegate:self];
+    [self.deviceManager startOrientationUpdate];
+
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -153,6 +162,10 @@ static CGFloat _rotationZ = 0;
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     
     [self stopUpdateMotion];
+}
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [self.deviceManager stopOrientationUpdate];
 }
 
 - (void)dealloc {
@@ -187,37 +200,19 @@ static CGFloat _rotationZ = 0;
                     [[UIApplication sharedApplication] openURL:url];
                 }
             }];
-            UIAlertAction *cancle = [UIAlertAction actionWithTitle:NSLocalizedString(@"取消", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"取消", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
                 [self dismissViewControllerAnimated:YES completion:nil];
             }];
             [choosePhotoAlert addAction:sure];
-            [choosePhotoAlert addAction:cancle];
+            [choosePhotoAlert addAction:cancel];
             [self presentViewController:choosePhotoAlert animated:YES completion:nil];
     }
 }
 
-#pragma mark - 屏幕旋转
-//屏幕旋转时调整视频预览图层的方向
--(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration{
-//    if (self.captureManager && [self.captureManager respondsToSelector:@selector(willRotateToInterfaceOrientation:duration:)]) {
-//        [self.captureManager willRotateToInterfaceOrientation:toInterfaceOrientation duration:duration];
-//    }
-}
 
-//旋转后重新设置大小
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
-//    if (self.captureManager && [self.captureManager respondsToSelector:@selector(didRotateFromInterfaceOrientation:)]) {
-//        [self.captureManager didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-//    }
-}
-
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-//    if (self.captureManager && [self.captureManager respondsToSelector:@selector(willAnimateRotationToInterfaceOrientation:duration:)]) {
-//        [self.captureManager willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
-//    }
-}
 #pragma mark - init
 - (void)loadCameraUI {
+    
     //相机按钮界面
     [self addContentView];
     //对焦框
@@ -227,6 +222,7 @@ static CGFloat _rotationZ = 0;
 }
 
 - (void)loadCamera {
+    
      CGRect preViewRect = CGRectMake(0,0, SCREEN_WIDTH_CY, SCREEN_HEIGHT_CY);
     //初始化session manager
     SCCaptureSessionManager *manager = [[SCCaptureSessionManager alloc] init];
@@ -314,12 +310,16 @@ static CGFloat _rotationZ = 0;
     
     [_captureManager takePicture:^(UIImage *stillImage) {
 
-        NSData *data = UIImageJPEGRepresentation(stillImage, 1);
-        UIImage *resultImg = [[UIImage alloc] initWithData:data];
+        //修正照片中的方向信息
+        UIImage *resultImg = [stillImage fixOrientation];
+        //根据手机方向旋转照片到正方向
+        resultImg = [resultImg rotatedByDegrees:_shouldRotaDegrees];
         UIImageWriteToSavedPhotosAlbum(resultImg, nil, nil, nil);
         [SVProgressHUD showSuccessWithStatus:@"拍照成功"];
     }];
 }
+
+
 
 #pragma mark 对焦事件相关
 #if SWITCH_SHOW_FOCUSVIEW_UNTIL_FOCUS_DONE
@@ -387,6 +387,42 @@ static CGFloat _rotationZ = 0;
 #endif
 }
 
+#pragma mark - 相机旋转
+
+- (void)deviceDidChangedToOrientation:(CYDeviceOrientation)orientation {
+    
+    //不做系统整体的旋转
+    
+    //1.计算出相片旋转到正方向需要旋转的角度
+    _shouldRotaDegrees = [self angleOffsetFromPortraitOrientationToOrientation:orientation];
+    //2.旋转所有的按钮
+    
+}
+
+//计算相片旋转到正方向需要旋转的角度
+- (CGFloat)angleOffsetFromPortraitOrientationToOrientation:(CYDeviceOrientation)orientation
+{
+    CGFloat angle = 0.0;
+    switch (orientation)
+    {
+        case CYDeviceOrientationPortrait:
+            angle = 0.0;
+            break;
+        case CYDeviceOrientationUpsideDown:
+            angle = 180;
+            break;
+        case CYDeviceOrientationLandscapeRight:
+            angle = -90;
+            break;
+        case CYDeviceOrientationLandscapeLeft:
+            angle = 90;
+            break;
+        default:
+            break;
+    }
+    return angle;
+}
+
 #pragma mark -- 图片的保存和处理
 //清除已生成的图片
 -(void)removeResultImg{
@@ -399,30 +435,6 @@ static CGFloat _rotationZ = 0;
     
 }
 
-
-
-- (CGFloat)angleOffsetFromPortraitOrientationToOrientation:(AVCaptureVideoOrientation)orientation
-{
-    CGFloat angle = 0.0;
-    switch (orientation)
-    {
-        case AVCaptureVideoOrientationPortrait:
-            angle = 0.0;
-            break;
-        case AVCaptureVideoOrientationPortraitUpsideDown:
-            angle = M_PI;
-            break;
-        case AVCaptureVideoOrientationLandscapeRight:
-            angle = -M_PI_2;
-            break;
-        case AVCaptureVideoOrientationLandscapeLeft:
-            angle = M_PI_2;
-            break;
-        default:
-            break;
-    }
-    return angle;
-}
 @end
 
 

@@ -220,6 +220,8 @@ static inline CGFloat DegreesToRadians(CGFloat degrees) {
 
 - (UIImage *)rotatedByDegrees:(CGFloat)degrees
 {
+ 
+    
     // calculate the size of the rotated view's containing box for our drawing space
     UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.size.width, self.size.height)];
     CGAffineTransform t = CGAffineTransformMakeRotation(DegreesToRadians(degrees));
@@ -228,17 +230,17 @@ static inline CGFloat DegreesToRadians(CGFloat degrees) {
     
     // Create the bitmap context
     UIGraphicsBeginImageContext(rotatedSize);
-    CGContextRef bitmap = UIGraphicsGetCurrentContext();
+    CGContextRef context = UIGraphicsGetCurrentContext();
     
     // Move the origin to the middle of the image so we will rotate and scale around the center.
-    CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
+    CGContextTranslateCTM(context, rotatedSize.width/2, rotatedSize.height/2);
     
     //   // Rotate the image context
-    CGContextRotateCTM(bitmap, DegreesToRadians(degrees));
+    CGContextRotateCTM(context, DegreesToRadians(degrees));
     
     // Now, draw the rotated/scaled image into the context
-    CGContextScaleCTM(bitmap, 1.0, -1.0);
-    CGContextDrawImage(bitmap, CGRectMake(-self.size.width / 2, -self.size.height / 2, self.size.width, self.size.height), [self CGImage]);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    CGContextDrawImage(context, CGRectMake(-self.size.width / 2, -self.size.height / 2, self.size.width, self.size.height), self.CGImage);
     
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();

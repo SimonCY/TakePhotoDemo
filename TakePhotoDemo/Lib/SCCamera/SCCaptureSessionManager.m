@@ -15,7 +15,8 @@
 
 //预览图层将要添加到的View
 @property (nonatomic, strong) UIView *parentView;
-
+/** 当前摄像头取景方向 */
+@property (nonatomic,assign) AVCaptureVideoOrientation videoOrientation;
 //前摄像头
 @property (nonatomic,strong) AVCaptureDevice* frontCamera;
 //后摄像头
@@ -528,36 +529,8 @@
     return pointOfInterest;
 }
 
-#pragma mark - rotate about
 
-//屏幕旋转时调整视频预览图层的方向
--(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    self.videoOrientation = [self videoOrientationForDeviceOrientation:(UIDeviceOrientation)toInterfaceOrientation];
-}
-
-//旋转后重新设置大小
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    self.previewLayer.frame= self.parentView.bounds;
-}
-
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-        if ((toInterfaceOrientation == UIDeviceOrientationLandscapeLeft) || (toInterfaceOrientation == UIDeviceOrientationLandscapeRight)) {
-            self.previewLayer.frame= CGRectMake(0, 0, (SCREEN_HEIGHT_CY > SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY, (SCREEN_HEIGHT_CY < SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY);
-        } else {
-            self.previewLayer.frame= CGRectMake(0, 0, (SCREEN_HEIGHT_CY < SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY, (SCREEN_HEIGHT_CY > SCREEN_WIDTH_CY)? SCREEN_HEIGHT_CY : SCREEN_WIDTH_CY);
-        }
-}
 #pragma mark ---------------private--------------
-
-/** 根据设备方向获取相机方向 */
-- (AVCaptureVideoOrientation)videoOrientationForDeviceOrientation:(UIDeviceOrientation)deviceOrientation {
-    AVCaptureVideoOrientation result = (AVCaptureVideoOrientation)deviceOrientation;
-    if ( deviceOrientation == UIDeviceOrientationLandscapeLeft )
-        result = AVCaptureVideoOrientationLandscapeRight;
-    else if ( deviceOrientation == UIDeviceOrientationLandscapeRight )
-        result = AVCaptureVideoOrientationLandscapeLeft;
-    return result;
-}
 
 /** 取得当前闪光模式 */
 - (AVCaptureFlashMode)flashMode {
@@ -586,6 +559,7 @@
     
     NSArray *devices = [AVCaptureDevice devices];
     for (AVCaptureDevice *device in devices) {
+        
         
         if ([device hasMediaType:AVMediaTypeVideo] && [device position] == AVCaptureDevicePositionFront) {
             CYLog(@"inputDevice:%@",device.localizedName);

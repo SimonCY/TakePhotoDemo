@@ -30,11 +30,11 @@ typedef NS_ENUM(NSUInteger, CameraContentViewBtnType) {
 
 @end
 
-@interface CameraContentView : UIView
+@interface CameraContentView: UIView
 @property (nonatomic,weak) id<CameraContentViewDelegate> delegate;
 
 @property (nonatomic,assign) preViewRota preRota;
-
+//@property (nonatomic,strong) NSArray* rotatedBtns;
 + (instancetype)contentView;
 
 @end

@@ -16,7 +16,6 @@
  */
 
 
-#import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
@@ -73,8 +72,7 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 /** 预览图层 */
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
 
-/** 当前相机方向 */
-@property (nonatomic,assign) AVCaptureVideoOrientation videoOrientation;
+
 
 /* ---------------------------pinch相关------------------ */
 @property (nonatomic, assign, readonly) CGFloat preScaleNum;
@@ -111,11 +109,8 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 
 /** 对焦 */
 - (void)focusInPoint:(CGPoint)devicePoint;
-/** 得到当前启用的摄像头，没有返回nil */
 
-//-(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration;
-//-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation;
-//- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration;
+
 @end
 
 
