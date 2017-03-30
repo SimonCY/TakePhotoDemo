@@ -18,6 +18,7 @@ typedef struct {
 typedef NS_ENUM(NSUInteger, CameraContentViewBtnType) {
     CameraContentViewBtnTypeDismiss,
     CameraContentViewBtnTypeTakePhoto,
+    CameraContentViewBtnTypeVideo,
     CameraContentViewBtnTypeSwitchCamera,
 };
 

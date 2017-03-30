@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1217" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -57,6 +57,15 @@
                         <constraint firstAttribute="height" constant="110" id="uXj-6x-abK"/>
                     </constraints>
                 </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sRH-mH-gDN">
+                    <rect key="frame" x="282" y="670" width="44" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="RJb-PX-IxL"/>
+                        <constraint firstAttribute="width" constant="44" id="lzh-Ow-8MZ"/>
+                    </constraints>
+                    <state key="normal" title="录像"/>
+                    <state key="selected" title="停止"/>
+                </button>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
@@ -65,7 +74,9 @@
                 <constraint firstAttribute="bottom" secondItem="42h-tJ-P6J" secondAttribute="bottom" constant="11" id="Aob-XG-HTd"/>
                 <constraint firstAttribute="bottom" secondItem="Jge-nk-pYd" secondAttribute="bottom" constant="22" id="Drt-Ph-Vkd"/>
                 <constraint firstItem="Ty0-lk-gkb" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="22" id="PY1-ls-N0J"/>
+                <constraint firstAttribute="bottom" secondItem="sRH-mH-gDN" secondAttribute="bottom" constant="22" id="SuA-ep-4Mg"/>
                 <constraint firstItem="IkL-8U-jNT" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="22" id="T9F-21-fMG"/>
+                <constraint firstItem="Jge-nk-pYd" firstAttribute="leading" secondItem="sRH-mH-gDN" secondAttribute="trailing" constant="22" id="ZEk-Dw-jN3"/>
                 <constraint firstAttribute="trailing" secondItem="Jge-nk-pYd" secondAttribute="trailing" constant="22" id="afB-3N-h0Y"/>
                 <constraint firstAttribute="trailing" secondItem="Ty0-lk-gkb" secondAttribute="trailing" constant="22" id="hvq-qS-f63"/>
                 <constraint firstItem="IkL-8U-jNT" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="22" id="ksP-16-aeO"/>
@@ -77,6 +88,7 @@
                 <outlet property="rotationPreView" destination="f8C-u5-e5V" id="gNy-22-lVm"/>
                 <outlet property="switchCameraBtn" destination="Ty0-lk-gkb" id="Hpx-nK-kR5"/>
                 <outlet property="takePhotoBtn" destination="Jge-nk-pYd" id="ubE-by-Njz"/>
+                <outlet property="videoBtn" destination="sRH-mH-gDN" id="uec-W5-WTO"/>
             </connections>
             <point key="canvasLocation" x="24" y="52"/>
         </view>

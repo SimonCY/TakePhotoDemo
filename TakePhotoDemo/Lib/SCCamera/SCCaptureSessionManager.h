@@ -29,6 +29,7 @@
 #define MIN_PINCH_SCALE_NUM   1.f
 
 typedef void(^DidCapturePhotoBlock)(UIImage *stillImage);
+typedef void(^DidFinishRecordingBlock)(NSURL *fileUrl);
 typedef void(^DidCaptureSwitchFlashModeBlock)(AVCaptureFlashMode flashMode);
 
 
@@ -54,14 +55,9 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 
 @interface SCCaptureSessionManager : NSObject
 
-/** 会话处理队列 */
-@property (nonatomic) dispatch_queue_t sessionQueue;
 
-/** 会话对象，执行输入设备和输出设备之间的数据传递 */
-@property (nonatomic, strong) AVCaptureSession *session;
 
-/** 输入设备 */
-@property (nonatomic, strong) AVCaptureDeviceInput *inputDevice;
+
 
 /** 照片输出流 */
 @property (nonatomic, strong) AVCaptureStillImageOutput *stillImageOutput;
@@ -69,8 +65,10 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 /** 视频输出流 */
 @property (nonatomic, strong) AVCaptureVideoDataOutput *videoOutput;
 
-/** 预览图层 */
-@property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
+/** 视频文件输出流 */
+@property (nonatomic,strong) AVCaptureMovieFileOutput* movieFileOutput;
+
+
 
 
 
@@ -94,8 +92,18 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 /** 初始化实时预览界面 */
 - (void)configureWithParentView:(UIView*)parentView previewRect:(CGRect)preivewRect thumbPreviewRect:(CGRect)thumbPreviewRect;
 
+/** 启动相机会话 */
+- (void)start;
+/** 停止相机会话 */
+- (void)stop;
+
 /** 拍照 */
 - (void)takePicture:(DidCapturePhotoBlock)block;
+
+/** 录像 (注意：录像的时候不能进行切换摄像头操作)*/
+- (void)startRecording;
+/** 停止录像 */
+- (void)stopRecording:(DidFinishRecordingBlock)block;
 
 /** 切换前后摄像头 */
 - (void)switchCamera:(SCCaptureInputDeviceType)lensType;

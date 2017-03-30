@@ -59,7 +59,7 @@
 #pragma mark - 陀螺仪相关
 
 
--(CMMotionManager *)motionManager {
+- (CMMotionManager *)motionManager {
     if (!_motionManager) {
         _motionManager = [[CMMotionManager alloc] init];
     }
@@ -110,7 +110,7 @@ static CGFloat _rotationZ = 0;
             
             preViewRota preRota = {_rotationX,_rotationY,_rotationZ};
             self.contentView.preRota = preRota;
-            NSLog(@"x: %f \n y: %f \n z: %f\n",_rotationX,_rotationY,_rotationZ);
+//            NSLog(@"x: %f \n y: %f \n z: %f\n",_rotationX,_rotationY,_rotationZ);
         }];
     }
 
@@ -142,6 +142,8 @@ static CGFloat _rotationZ = 0;
     
     self.deviceManager = [[CYDeviceManager alloc] initWithDelegate:self];
     [self.deviceManager startOrientationUpdate];
+    
+    [self.captureManager start];
 
 }
 
@@ -162,6 +164,7 @@ static CGFloat _rotationZ = 0;
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     
     [self stopUpdateMotion];
+    [self.captureManager stop];
 }
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
@@ -233,9 +236,7 @@ static CGFloat _rotationZ = 0;
     [manager configureWithParentView:self.view previewRect:preViewRect thumbPreviewRect:CGRectMake(10, 50, 200,200)];
     self.captureManager = manager;
     //运行会话
-    if (!self.captureManager.session.isRunning) {
-        [self.captureManager.session startRunning];
-    }
+    
     
     //其他一些无聊的配置
     alphaTimes = -1;
@@ -283,6 +284,9 @@ static CGFloat _rotationZ = 0;
         case CameraContentViewBtnTypeSwitchCamera:
             [self switchCameraBtnPressed:btn];
             break;
+        case CameraContentViewBtnTypeVideo:
+            [self videoBtnPressed:btn];
+            break;
         default:
             break;
     }
@@ -319,6 +323,17 @@ static CGFloat _rotationZ = 0;
     }];
 }
 
+- (void)videoBtnPressed:(UIButton *)sender {
+    if (sender.isSelected) {
+        
+        [self.captureManager startRecording];
+    } else {
+        [self.captureManager stopRecording:^(NSURL *fileUrl) {
+            CYLog(@"%@ is ",fileUrl);
+            
+        }];
+    }
+}
 
 
 #pragma mark 对焦事件相关
@@ -357,10 +372,7 @@ static CGFloat _rotationZ = 0;
     
     UITouch *touch = [touches anyObject];
     currTouchPoint = [touch locationInView:self.view];
-    
-    if (CGRectContainsPoint(_captureManager.previewLayer.frame, currTouchPoint) == NO) {
-        return;
-    }
+
     
     [_captureManager focusInPoint:currTouchPoint];
     

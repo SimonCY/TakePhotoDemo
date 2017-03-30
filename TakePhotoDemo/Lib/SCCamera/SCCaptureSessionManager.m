@@ -11,23 +11,56 @@
 
 #import "UIImage+CYExtension.h"
 
-@interface SCCaptureSessionManager ()<AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface SCCaptureSessionManager ()<AVCaptureVideoDataOutputSampleBufferDelegate,AVCaptureFileOutputRecordingDelegate>
 
 //预览图层将要添加到的View
 @property (nonatomic, strong) UIView *parentView;
+/** 预览图层 */
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
+
+
+/** 会话对象，执行输入设备和输出设备之间的数据传递 */
+@property (nonatomic, strong) AVCaptureSession *session;
+
+
+/** 会话处理队列 */
+@property (nonatomic) dispatch_queue_t sessionQueue;
 /** 当前摄像头取景方向 */
 @property (nonatomic,assign) AVCaptureVideoOrientation videoOrientation;
+
+
 //前摄像头
 @property (nonatomic,strong) AVCaptureDevice* frontCamera;
 //后摄像头
 @property (nonatomic,strong) AVCaptureDevice* backCamera;
 //麦克风
 @property (nonatomic,strong) AVCaptureDevice* audioDevice;
- 
+
+/** 当前视频输入设备input(前或后摄像头input) */
+@property (nonatomic, strong) AVCaptureDeviceInput *videoDeviceInput;
+/** 当前音频输入设备input(音频input) */
+@property (nonatomic, strong) AVCaptureDeviceInput *audioDeviceInput;
+
+@property (nonatomic,copy) NSString* recordingMoviePath;
+
+@property (nonatomic,weak) DidFinishRecordingBlock finishRecordingBlock;
+
 @end
 
 
 @implementation SCCaptureSessionManager
+
+- (void)start {
+    if (!self.session.isRunning) {
+        [self.session startRunning];
+    }
+}
+
+- (void)stop {
+    if (self.session.isRunning) {
+        [self.session stopRunning];
+    }
+}
 
 
 #pragma mark setup
@@ -45,9 +78,6 @@
     
     [_session stopRunning];
     
-    self.previewLayer = nil;
-    self.session = nil;
-    self.stillImageOutput = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -64,14 +94,21 @@
     //3、previewLayer
     [self addVideoPreviewLayerWithParentLayer:parentView.layer rect:preivewRect];
 
-    //4、input (默认后置摄像头)
+    //4、videoinput (默认后置摄像头)
     [self addVideoInputLens:SCCaptureInputDeviceTypeBackLens];
     
-    //5、output （默认是相机）
+    //5、audioinput
+    [self addAudioInput];
+    
+    
+    //6、stillImageoutput （默认是相机）
     [self addStillImageOutput];
     
+    //7.videoOutput
+    [self addMovieFileOutput];
+    
     //6、thumbPreView
-    [self addThumbPreViewWithParentView:parentView thumbPreviewRect:thumbPreviewRect];
+//    [self addThumbPreViewWithParentView:parentView thumbPreviewRect:thumbPreviewRect];
 }
 
 /** 创建相机操作队列，防止阻塞主线程 */
@@ -120,7 +157,7 @@
             if (!error) {
                 if ([_session canAddInput:backFacingCameraDeviceInput]) {
                     [_session addInput:backFacingCameraDeviceInput];
-                    self.inputDevice = backFacingCameraDeviceInput;
+                    self.videoDeviceInput = backFacingCameraDeviceInput;
                     
                 } else {
                     CYLog(@"无法切换到后摄像头");
@@ -134,7 +171,7 @@
             if (!error) {
                 if ([_session canAddInput:frontFacingCameraDeviceInput]) {
                     [_session addInput:frontFacingCameraDeviceInput];
-                    self.inputDevice = frontFacingCameraDeviceInput;
+                    self.videoDeviceInput = frontFacingCameraDeviceInput;
                     
                 } else {
                     CYLog(@"无法切换到前摄像头");
@@ -145,6 +182,21 @@
         default:
             break;
     }
+}
+
+- (void)addAudioInput {
+    NSError *error = nil;
+    AVCaptureDeviceInput *audioDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:self.audioDevice error:&error];
+    if (!error) {
+        if ([_session canAddInput:audioDeviceInput]) {
+            [_session addInput:audioDeviceInput];
+            self.audioDeviceInput = audioDeviceInput;
+            
+        } else {
+            CYLog(@"无法添加麦克风");
+        }
+    }
+
 }
 
 /** 添加相机输出设备 */
@@ -159,6 +211,16 @@
         
         [_session addOutput:tmpOutput];
         self.stillImageOutput = tmpOutput;
+    }
+    
+}
+
+- (void)addMovieFileOutput {
+    AVCaptureMovieFileOutput *fileOutput = [[AVCaptureMovieFileOutput alloc] init];
+    
+    if ([_session canAddOutput:fileOutput]) {
+        [_session addOutput:fileOutput];
+        self.movieFileOutput = fileOutput;
     }
     
 }
@@ -226,16 +288,34 @@
     AVCaptureConnection *videoConnection = [self findCaptureConnectionFromVideoOutput];
     videoConnection.videoOrientation = videoOrientation;
     
+    AVCaptureConnection *movieFileConnection = [self findCaptureConnectionFromMovieFileOutput];
+    movieFileConnection.videoOrientation = videoOrientation;
+    
     AVCaptureConnection *previewConnection = [self.previewLayer connection];
     previewConnection.videoOrientation = videoOrientation;
+    
 }
 
 
 #pragma mark - camera actions
 
-/**
- * 拍照
- */
+- (void)startRecording {
+    if ([self.movieFileOutput isRecording]) return;
+    
+    self.recordingMoviePath = [self newMP4FilePath];
+    [self.movieFileOutput startRecordingToOutputFileURL:[NSURL fileURLWithPath:self.recordingMoviePath] recordingDelegate:self];
+}
+
+- (void)stopRecording:(DidFinishRecordingBlock)block {
+    
+    if ([self.movieFileOutput isRecording]) {
+        [self.movieFileOutput stopRecording];
+        self.recordingMoviePath = nil;
+        self.finishRecordingBlock  = block;
+    }
+}
+
+/** 拍照 */
 - (void)takePicture:(DidCapturePhotoBlock)block {
     AVCaptureConnection *videoConnection = [self findCaptureConnectionFromStillImageOutput];
 
@@ -291,12 +371,12 @@
  *  @param lensType 摄像头类型
  */
 - (void)switchCamera:(SCCaptureInputDeviceType)lensType {
-    if (!_inputDevice) {
+    if (!_videoDeviceInput) {
         CYLog(@"当前没有输入设备");
         return;
     }
     [_session beginConfiguration];
-    [_session removeInput:_inputDevice];
+    [_session removeInput:_videoDeviceInput];
     [self addVideoInputLens:lensType];
     [_session commitConfiguration];
 }
@@ -430,7 +510,7 @@
 - (void)focusWithMode:(AVCaptureFocusMode)focusMode exposeWithMode:(AVCaptureExposureMode)exposureMode atDevicePoint:(CGPoint)point monitorSubjectAreaChange:(BOOL)monitorSubjectAreaChange {
     
 	dispatch_async(_sessionQueue, ^{
-		AVCaptureDevice *device = [_inputDevice device];
+		AVCaptureDevice *device = [_videoDeviceInput device];
 		NSError *error = nil;
 		if ([device lockForConfiguration:&error])
 		{
@@ -586,6 +666,7 @@
 }
 /** 取得当前声音输入设备 */
 - (AVCaptureDevice *)audioDevice {
+    [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
     
     NSArray *devices = [AVCaptureDevice devices];
     for (AVCaptureDevice *device in devices) {
@@ -631,6 +712,58 @@
         }
     }
     return videoConnection;
+}
+
+
+/** 得到视频输出的设备连接 （视频专用）*/
+- (AVCaptureConnection*)findCaptureConnectionFromMovieFileOutput {
+    AVCaptureConnection *videoConnection = nil;
+    for (AVCaptureConnection *connection in _movieFileOutput.connections) {
+        for (AVCaptureInputPort *port in connection.inputPorts) {
+            if ([[port mediaType] isEqual:AVMediaTypeVideo]) {
+                videoConnection = connection;
+                break;
+            }
+        }
+        if (videoConnection) {
+            break;
+        }
+    }
+    return videoConnection;
+}
+
+#pragma mark - 生成视频文件相关
+
+- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray *)connections {
+
+}
+
+- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error {
+    if (!error) {
+        if (self.finishRecordingBlock) {
+            self.finishRecordingBlock(outputFileURL);
+        }
+    } else {
+        CYLog(@"录制失败");
+    }
+}
+
+
+//生成caches目录下不带后缀名的一个以时间戳为名的新文件路径
+- (NSString *)newTimeStrFilePath {
+    
+    //生成时间戳
+    long recordTime = (NSInteger)[[NSDate date] timeIntervalSince1970]*1000;
+    NSString *timeString = [NSString stringWithFormat:@"%ld",recordTime];
+    
+    //生成路径
+    NSArray *CachesPaths =NSSearchPathForDirectoriesInDomains(NSCachesDirectory,NSUserDomainMask,YES);
+    NSString *filePath =[[CachesPaths objectAtIndex:0] stringByAppendingPathComponent:timeString];
+    return filePath;
+}
+
+- (NSString *)newMP4FilePath{
+    return [NSString stringWithFormat:@"%@.mp4",[self newTimeStrFilePath]];
 }
 
 @end

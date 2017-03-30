@@ -14,9 +14,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *takePhotoBtn;
 @property (weak, nonatomic) IBOutlet UIButton *switchCameraBtn;
 @property (weak, nonatomic) IBOutlet UIView *rotationPreView;
+@property (weak, nonatomic) IBOutlet UIButton *videoBtn;
 
 
 @end
+
 @implementation CameraContentView
 + (instancetype)contentView {
     return [[[NSBundle mainBundle] loadNibNamed:@"CameraContentView" owner:nil options:nil] lastObject];
@@ -29,7 +31,7 @@
     [self.dismissBtn addTarget:self action:@selector(dismissBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.takePhotoBtn addTarget:self action:@selector(takePhotoBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.switchCameraBtn addTarget:self action:@selector(switchCameraBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
-    
+    [self.videoBtn addTarget:self action:@selector(videoBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
 
 }
 - (void)layoutSubviews {
@@ -78,6 +80,13 @@
 - (void)takePhotoBtnClicked:(UIButton *)btn {
     if (self.delegate && [self.delegate respondsToSelector:@selector(cameraContentView:didClickBtn:withType:)]) {
         [self.delegate cameraContentView:self didClickBtn:btn withType:CameraContentViewBtnTypeTakePhoto];
+    }
+}
+
+- (void)videoBtnClicked:(UIButton *)btn {
+    btn.selected = !btn.isSelected;
+    if (self.delegate && [self.delegate respondsToSelector:@selector(cameraContentView:didClickBtn:withType:)]) {
+        [self.delegate cameraContentView:self didClickBtn:btn withType:CameraContentViewBtnTypeVideo];
     }
 }
 
