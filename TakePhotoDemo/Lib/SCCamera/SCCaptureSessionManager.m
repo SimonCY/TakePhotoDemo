@@ -36,10 +36,22 @@
 //麦克风
 @property (nonatomic,strong) AVCaptureDevice* audioDevice;
 
+
 /** 当前视频输入设备input(前或后摄像头input) */
 @property (nonatomic, strong) AVCaptureDeviceInput *videoDeviceInput;
 /** 当前音频输入设备input(音频input) */
 @property (nonatomic, strong) AVCaptureDeviceInput *audioDeviceInput;
+
+
+
+/** 照片输出流 */
+@property (nonatomic, strong) AVCaptureStillImageOutput *stillImageOutput;
+/** 视频输出流 */
+@property (nonatomic, strong) AVCaptureVideoDataOutput *videoOutput;
+/** 视频文件输出流 */
+@property (nonatomic,strong) AVCaptureMovieFileOutput* movieFileOutput;
+
+
 
 @property (nonatomic,copy) NSString* recordingMoviePath;
 

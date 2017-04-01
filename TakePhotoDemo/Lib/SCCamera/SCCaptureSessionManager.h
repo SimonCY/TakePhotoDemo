@@ -55,23 +55,6 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 
 @interface SCCaptureSessionManager : NSObject
 
-
-
-
-
-/** 照片输出流 */
-@property (nonatomic, strong) AVCaptureStillImageOutput *stillImageOutput;
-
-/** 视频输出流 */
-@property (nonatomic, strong) AVCaptureVideoDataOutput *videoOutput;
-
-/** 视频文件输出流 */
-@property (nonatomic,strong) AVCaptureMovieFileOutput* movieFileOutput;
-
-
-
-
-
 /* ---------------------------pinch相关------------------ */
 @property (nonatomic, assign, readonly) CGFloat preScaleNum;
 
@@ -104,6 +87,7 @@ typedef NS_ENUM(NSUInteger, SCCaptureOutputDeviceType) {
 - (void)startRecording;
 /** 停止录像 */
 - (void)stopRecording:(DidFinishRecordingBlock)block;
+
 
 /** 切换前后摄像头 */
 - (void)switchCamera:(SCCaptureInputDeviceType)lensType;
